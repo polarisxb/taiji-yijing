@@ -17,8 +17,8 @@ export function ScrollRevealSection({ children, className = '', delay = 0 }: Pro
       className={className}
       style={{
         opacity: visible ? 1 : 0,
-        transform: visible ? 'none' : 'translateY(24px)',
-        transition: `opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1) ${delay}ms, transform 0.7s cubic-bezier(0.16, 1, 0.3, 1) ${delay}ms`,
+        transform: visible ? 'translateY(0) scale(1)' : 'translateY(32px) scale(0.98)',
+        transition: `opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1) ${delay}ms, transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) ${delay}ms`,
       }}
     >
       {children}

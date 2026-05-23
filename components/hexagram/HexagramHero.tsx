@@ -15,9 +15,12 @@ export function HexagramHero({ hexagram }: Props) {
       </div>
 
       <div className="inline-flex flex-col items-center">
-        <div className="hexagram-display flex flex-col items-center justify-center w-28 h-32 rounded-lg mb-8">
+        <div
+          className="hexagram-display corner-ornament flex flex-col items-center justify-center w-32 h-36 rounded-lg mb-8"
+          style={{ animation: 'heroFloat 4s ease-in-out infinite' }}
+        >
           <HexagramSymbol binary={binary} size="lg" className="text-[var(--color-ink-800)]" />
-          <div className="mt-2 text-[10px] tracking-wider text-[var(--color-ink-400)] font-serif">
+          <div className="mt-3 text-[10px] tracking-wider text-[var(--color-ink-400)] font-serif">
             {trigrams.upper}上 · {trigrams.lower}下
           </div>
         </div>

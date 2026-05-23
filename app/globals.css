@@ -527,6 +527,29 @@ body {
   border-color: var(--color-vermillion);
   background: var(--color-vermillion);
   box-shadow: 0 0 8px rgba(196, 80, 58, 0.3);
+  animation: yaoRipple 2s ease-in-out infinite;
+}
+
+@keyframes yaoRipple {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(196, 80, 58, 0.4);
+  }
+  50% {
+    box-shadow:
+      0 0 0 6px rgba(196, 80, 58, 0),
+      0 0 8px rgba(196, 80, 58, 0.2);
+  }
+}
+
+@keyframes heroFloat {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-4px) rotate(0.5deg);
+  }
 }
 
 /* ——— 阶段高亮提示 ——— */
@@ -543,4 +566,19 @@ body {
   font-size: 0.65rem;
   letter-spacing: 0.1em;
   animation: breathe 2s ease-in-out infinite;
+}
+
+/* ——— 页面入场动画 ——— */
+@keyframes pageEnter {
+  from {
+    opacity: 0;
+    filter: blur(2px);
+  }
+  to {
+    opacity: 1;
+    filter: blur(0);
+  }
+}
+.animate-page-enter {
+  animation: pageEnter 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
 }

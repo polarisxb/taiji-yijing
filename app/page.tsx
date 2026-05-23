@@ -382,10 +382,19 @@ export default function Home() {
 
         {/* ——— Footer ——— */}
         <footer className="mt-32 text-center">
-          <div className="divider-classical mb-10">
-            <span className="font-serif text-lg">☯</span>
+          {/* 水墨晕染分割 */}
+          <div className="relative mb-12">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full h-px bg-gradient-to-r from-transparent via-[var(--color-ink-200)] to-transparent" />
+            </div>
+            <div className="relative flex justify-center">
+              <div className="bg-[var(--color-paper)] px-6">
+                <span className="font-serif text-lg text-[var(--color-ink-300)]">☯</span>
+              </div>
+            </div>
           </div>
-          <div className="space-y-5">
+
+          <div className="space-y-6">
             <p className="font-serif text-[var(--color-ink-600)] text-sm">
               <span className="seal">义理派</span>
             </p>
@@ -398,12 +407,19 @@ export default function Home() {
               <br />
               同输入恒得同输出，确定而可验
             </p>
-            <div className="flex items-center justify-center gap-3 pt-4">
-              <span className="w-8 h-px bg-[var(--color-ink-200)]" />
-              <span className="text-[var(--color-ink-400)] font-mono text-[10px] tracking-[0.3em]">
-                v0.1 · 3/64
-              </span>
-              <span className="w-8 h-px bg-[var(--color-ink-200)]" />
+
+            {/* 古典尾注 */}
+            <div className="pt-6 pb-4 space-y-3">
+              <div className="flex items-center justify-center gap-4">
+                <span className="w-12 h-px bg-gradient-to-r from-transparent to-[var(--color-ink-200)]" />
+                <span className="text-[var(--color-ink-300)] font-mono text-[10px] tracking-[0.3em]">
+                  v0.1 · 3/64
+                </span>
+                <span className="w-12 h-px bg-gradient-to-l from-transparent to-[var(--color-ink-200)]" />
+              </div>
+              <p className="text-[var(--color-ink-300)] text-[10px] font-serif tracking-wide">
+                以义解经 · 以象观变 · 以诚待人
+              </p>
             </div>
           </div>
         </footer>
