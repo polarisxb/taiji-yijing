@@ -1,0 +1,70 @@
+# Taiji Project — Windsurf Rules (Powered by Superpowers)
+
+## Identity
+
+This is the **太极 · 易经决策框架** project — a Next.js 15 + React 19 + TypeScript + Tailwind CSS 4 application.
+
+## Superpowers Integration
+
+This project uses the [Superpowers](https://github.com/obra/superpowers) agentic skills framework.
+All skill definitions live in `.windsurf/skills/`. Before any non-trivial task, check if a skill applies.
+
+### Mandatory Workflow
+
+1. **Before writing code** — Check if `brainstorming` or `writing-plans` skill applies
+2. **Before implementing** — Follow `test-driven-development` (RED → GREEN → REFACTOR)
+3. **When debugging** — Follow `systematic-debugging` (4-phase root cause process)
+4. **After completing work** — Follow `verification-before-completion`
+5. **Before marking done** — Follow `requesting-code-review` checklist
+
+### Skill Reference Quick Map
+
+| Situation | Skill File |
+|-----------|-----------|
+| New feature/big change | `.windsurf/skills/brainstorming/SKILL.md` |
+| Implementation planning | `.windsurf/skills/writing-plans/SKILL.md` |
+| Executing a plan | `.windsurf/skills/executing-plans/SKILL.md` |
+| Writing/fixing code | `.windsurf/skills/test-driven-development/SKILL.md` |
+| Bug or failure | `.windsurf/skills/systematic-debugging/SKILL.md` |
+| Verifying completion | `.windsurf/skills/verification-before-completion/SKILL.md` |
+| Code review | `.windsurf/skills/requesting-code-review/SKILL.md` |
+| Finishing a branch | `.windsurf/skills/finishing-a-development-branch/SKILL.md` |
+
+### Core Principles (from Superpowers)
+
+- **TDD** — No production code without a failing test first
+- **YAGNI** — Don't build what isn't needed yet
+- **DRY** — Don't repeat yourself
+- **Systematic > Ad-hoc** — Process over guessing
+- **Evidence > Claims** — Verify before declaring success
+- **Root cause > Symptoms** — Fix the source, not the surface
+
+## Project-Specific Rules
+
+### Tech Stack
+- Next.js 15 (App Router)
+- React 19
+- TypeScript (strict)
+- Tailwind CSS 4 (@theme syntax)
+- No external API dependencies for MVP
+
+### Content Rules
+- 义理派立场 — 不做占卜，只做情境模式匹配
+- 内容编写规范见 `docs/CONTENT-GUIDE.md`
+- 字符串内嵌引号统一用「」，不用英文双引号
+
+### Code Style
+- Chinese-first UI text, i18n-ready architecture
+- Prefer font-serif for classical content, font-sans for UI chrome
+- CSS variables for all colors (--color-ink-*, --color-vermillion, --color-gold)
+- Components in `components/`, hooks in `hooks/`, types in `lib/types.ts`
+
+### Plans & Documentation
+- Implementation plans go to `docs/superpowers/plans/`
+- Design specs go to `docs/superpowers/specs/`
+- Keep plans granular: 2-5 min per task step
+
+### Git Conventions
+- Commit messages: `feat:`, `fix:`, `refactor:`, `docs:`, `test:`, `chore:`
+- Frequent small commits over large batches
+- Branch naming: `feat/<name>`, `fix/<name>`, `refactor/<name>`

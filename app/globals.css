@@ -1,0 +1,479 @@
+@import 'tailwindcss';
+
+@theme {
+  --font-serif: 'Noto Serif SC', 'Source Han Serif SC', 'Songti SC', 'STSong', '宋体', serif;
+  --font-sans:
+    'PingFang SC', 'Microsoft YaHei', system-ui, -apple-system, 'Segoe UI', 'Roboto', sans-serif;
+
+  /* 宣纸 & 墨色 */
+  --color-paper: #f5f0e8;
+  --color-paper-light: #faf7f0;
+  --color-ink-50: #f5f0e8;
+  --color-ink-100: #e8e0d0;
+  --color-ink-200: #d4c9b5;
+  --color-ink-400: #8a7e6a;
+  --color-ink-600: #4a4238;
+  --color-ink-700: #3a342c;
+  --color-ink-800: #2a2420;
+  --color-ink-900: #1a1610;
+
+  /* 朱砂 */
+  --color-vermillion: #c4503a;
+  --color-vermillion-light: #d4604a;
+  --color-vermillion-dark: #a03828;
+  --color-vermillion-bg: #fdf5f3;
+
+  /* 古铜金 */
+  --color-gold: #b8962c;
+  --color-gold-light: #d4b04a;
+  --color-gold-dark: #8a6e1a;
+
+  --color-accent: #b8962c;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--color-paper);
+  color: var(--color-ink-900);
+  font-family: var(--font-sans);
+  font-feature-settings: 'ss01', 'ss02';
+  /* 宣纸纹理 */
+  background-image:
+    radial-gradient(ellipse at 20% 50%, rgba(180, 160, 120, 0.06) 0%, transparent 60%),
+    radial-gradient(ellipse at 80% 20%, rgba(160, 140, 100, 0.05) 0%, transparent 50%),
+    url("data:image/svg+xml,%3Csvg width='60' height='60' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='60' height='60' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+}
+
+.font-serif {
+  font-family: var(--font-serif);
+}
+
+/* ——— 古典印章 ——— */
+.seal {
+  display: inline-block;
+  padding: 3px 8px;
+  border: 2px solid var(--color-vermillion);
+  background: transparent;
+  color: var(--color-vermillion);
+  font-family: var(--font-serif);
+  font-weight: 700;
+  font-size: 0.85em;
+  letter-spacing: 0.1em;
+  line-height: 1;
+  transform: rotate(-2deg);
+  position: relative;
+}
+.seal::after {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border: 1px solid var(--color-vermillion);
+  opacity: 0.3;
+}
+
+/* ——— 太极图 CSS ——— */
+.taiji-symbol {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(to right, var(--color-ink-900) 50%, var(--color-paper-light) 50%);
+  border: 2px solid var(--color-ink-800);
+}
+.taiji-symbol::before,
+.taiji-symbol::after {
+  content: '';
+  position: absolute;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+}
+.taiji-symbol::before {
+  background: var(--color-paper-light);
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  box-shadow:
+    inset 0 0 0 8px var(--color-paper-light),
+    inset 0 0 0 10px var(--color-ink-900);
+}
+.taiji-symbol::after {
+  background: var(--color-ink-900);
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  box-shadow:
+    inset 0 0 0 8px var(--color-ink-900),
+    inset 0 0 0 10px var(--color-paper-light);
+}
+
+/* ——— 古典分割线 ——— */
+.divider-classical {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  color: var(--color-ink-200);
+}
+.divider-classical::before,
+.divider-classical::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(to right, transparent, var(--color-ink-200), transparent);
+}
+.divider-classical span {
+  font-size: 12px;
+  letter-spacing: 0.2em;
+  color: var(--color-ink-400);
+}
+
+/* ——— 卦象大图样式 ——— */
+.hexagram-display {
+  background: linear-gradient(135deg, var(--color-paper-light), var(--color-ink-50));
+  border: 1px solid var(--color-ink-200);
+  position: relative;
+}
+.hexagram-display::before {
+  content: '';
+  position: absolute;
+  inset: 3px;
+  border: 1px solid var(--color-ink-200);
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+/* ——— 古典引用 ——— */
+.classical-quote {
+  font-family: var(--font-serif);
+  font-style: normal;
+  border-left: 3px solid var(--color-vermillion);
+  padding-left: 16px;
+  color: var(--color-ink-800);
+  position: relative;
+}
+.classical-quote::before {
+  content: '「';
+  font-size: 2em;
+  color: var(--color-vermillion);
+  opacity: 0.3;
+  position: absolute;
+  left: 6px;
+  top: -8px;
+  line-height: 1;
+}
+
+/* ——— 卡片古典风格 ——— */
+.card-classical {
+  background: var(--color-paper-light);
+  border: 1px solid var(--color-ink-200);
+  position: relative;
+  overflow: hidden;
+}
+.card-classical::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(
+    to right,
+    transparent,
+    var(--color-vermillion),
+    var(--color-gold),
+    var(--color-vermillion),
+    transparent
+  );
+}
+
+/* ——— 纹饰角标 ——— */
+.corner-ornament {
+  position: relative;
+}
+.corner-ornament::before,
+.corner-ornament::after {
+  content: '';
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  border-color: var(--color-ink-200);
+  border-style: solid;
+  border-width: 0;
+}
+.corner-ornament::before {
+  top: -1px;
+  left: -1px;
+  border-top-width: 2px;
+  border-left-width: 2px;
+}
+.corner-ornament::after {
+  bottom: -1px;
+  right: -1px;
+  border-bottom-width: 2px;
+  border-right-width: 2px;
+}
+
+/* ——— 按钮古典风 ——— */
+.btn-classical {
+  background: var(--color-ink-900);
+  color: var(--color-paper-light);
+  border: none;
+  position: relative;
+  transition: all 0.2s;
+}
+.btn-classical:hover {
+  background: var(--color-ink-800);
+  box-shadow: 0 2px 8px rgba(26, 22, 16, 0.2);
+}
+.btn-classical::after {
+  content: '';
+  position: absolute;
+  inset: 2px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  pointer-events: none;
+}
+
+/* ——— 爻行样式 ——— */
+.yao-row {
+  border: 1px solid var(--color-ink-100);
+  transition: all 0.15s;
+}
+.yao-row:hover {
+  border-color: var(--color-ink-200);
+  background: var(--color-paper-light);
+}
+
+/* ——— 动画 ——— */
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.animate-fade-up {
+  animation: fadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes fadeUpStagger1 {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes fadeUpStagger2 {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes fadeUpStagger3 {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-stagger-1 {
+  animation: fadeUpStagger1 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.1s both;
+}
+.animate-stagger-2 {
+  animation: fadeUpStagger2 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.25s both;
+}
+.animate-stagger-3 {
+  animation: fadeUpStagger3 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.4s both;
+}
+
+@keyframes taiji-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes breathe {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.6;
+  }
+  50% {
+    transform: scale(1.15);
+    opacity: 1;
+  }
+}
+
+@keyframes brushStroke {
+  from {
+    width: 0;
+  }
+  to {
+    width: 100%;
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 0.3;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.3);
+  }
+}
+
+/* 标题书法入场 */
+@keyframes titleReveal {
+  from {
+    opacity: 0;
+    transform: translateY(-10px) scale(0.96);
+    filter: blur(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+  }
+}
+.animate-title {
+  animation: titleReveal 1s cubic-bezier(0.16, 1, 0.3, 1) 0.2s both;
+}
+
+/* 古典分割线入场 */
+@keyframes lineExpand {
+  from {
+    width: 0;
+    opacity: 0;
+  }
+  to {
+    width: 100%;
+    opacity: 1;
+  }
+}
+
+/* 输入框聚焦光效 */
+.input-glow:focus-within {
+  box-shadow:
+    0 0 0 1px var(--color-vermillion),
+    0 0 20px rgba(196, 80, 58, 0.08);
+}
+
+/* 卡片 hover 提升 */
+.card-classical {
+  transition:
+    transform 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 0.25s ease;
+}
+.card-classical:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    0 8px 30px rgba(26, 22, 16, 0.1),
+    0 2px 8px rgba(26, 22, 16, 0.06);
+}
+
+/* ——— 墨水涟漪 ——— */
+@keyframes ink-ripple {
+  0% {
+    width: 0;
+    height: 0;
+    opacity: 0.6;
+  }
+  100% {
+    width: 300px;
+    height: 300px;
+    opacity: 0;
+  }
+}
+
+/* ——— 卦象 hover 光晕 ——— */
+.hexagram-display {
+  transition: box-shadow 0.3s ease;
+}
+.hexagram-display:hover {
+  box-shadow:
+    0 0 20px rgba(196, 80, 58, 0.1),
+    0 0 40px rgba(184, 150, 44, 0.06);
+}
+
+/* ——— 标签/徽章微交互 ——— */
+.tag-interactive {
+  transition: all 0.15s ease;
+  cursor: default;
+}
+.tag-interactive:hover {
+  background: var(--color-paper);
+  border-color: var(--color-ink-400);
+  transform: translateY(-1px);
+}
+
+/* ——— 古典引用渐现 ——— */
+.classical-quote {
+  transition: opacity 0.4s ease;
+}
+
+/* ——— 印章 hover ——— */
+.seal {
+  transition: transform 0.2s ease;
+}
+.seal:hover {
+  transform: rotate(0deg) scale(1.05);
+}
+
+/* ——— 分割线入场动画 ——— */
+.divider-animated::before,
+.divider-animated::after {
+  animation: lineExpand 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* ——— 平滑渐变滚动条 ——— */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-ink-200);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-ink-400);
+}
+
+/* ——— 选中文字风格 ——— */
+::selection {
+  background: rgba(196, 80, 58, 0.15);
+  color: var(--color-ink-900);
+}

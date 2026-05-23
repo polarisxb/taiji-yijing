@@ -1,0 +1,296 @@
+'use client'
+
+import { useState } from 'react'
+import { MatchCard } from '@/components/MatchCard'
+import { TaijiSymbol } from '@/components/TaijiSymbol'
+import { Atmosphere } from '@/components/Atmosphere'
+import { DivinationLoader } from '@/components/DivinationLoader'
+import type { ConsultResponse } from '@/lib/types'
+
+const SAMPLE_SITUATIONS = [
+  {
+    label: '考虑辞职创业',
+    text: '我在大厂工作了 5 年，最近想辞职出来创业。手里有一些积蓄但不多，方向也还没完全想清楚。每天上班都觉得在浪费时间，但真要走又怕做错决定。',
+  },
+  {
+    label: '公司刚拿到种子轮',
+    text: '我们公司刚拿到种子轮融资，团队就 4 个人。投资人和身边的人都鼓励我快速扩张、招大量员工、做更多产品线。但我直觉团队和产品都还没准备好。',
+  },
+  {
+    label: '和合伙人闹分歧',
+    text: '我和合伙人在产品方向上吵了很久，他要做 to B，我坚持 to C。最近两次会议都不欢而散，我开始怀疑这个合作还能不能继续。',
+  },
+  {
+    label: '被推上高位',
+    text: '公司刚提我做总监，下面带 30 个人。但我自己其实更喜欢做事而不是管人，担心自己在这个位置会失去原本的优势。',
+  },
+]
+
+export default function Home() {
+  const [situation, setSituation] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [result, setResult] = useState<ConsultResponse | null>(null)
+  const [error, setError] = useState<string | null>(null)
+
+  async function handleSubmit() {
+    if (!situation.trim()) return
+    setLoading(true)
+    setError(null)
+    setResult(null)
+    try {
+      const res = await fetch('/api/consult', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ situation: situation.trim() }),
+      })
+      if (!res.ok) {
+        const data = await res.json().catch(() => null)
+        throw new Error(data?.error ?? `请求失败：${res.status}`)
+      }
+      const data = (await res.json()) as ConsultResponse
+      setResult(data)
+    } catch (e) {
+      setError(e instanceof Error ? e.message : '未知错误')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  return (
+    <>
+      <Atmosphere />
+
+      <div className="relative z-10 max-w-3xl mx-auto px-6 py-16 md:py-24">
+        {/* ——— Header — 编排入场序列 ——— */}
+        <header className="mb-24 text-center">
+          <div className="inline-flex flex-col items-center">
+            {/* 太极图 — 第 1 层，0s */}
+            <div style={{ animation: 'fadeUp 1s cubic-bezier(0.16,1,0.3,1) 0s both' }}>
+              <TaijiSymbol size={110} className="mb-10" />
+            </div>
+
+            {/* 标题 — 第 2 层，0.3s */}
+            <h1
+              className="font-serif text-7xl md:text-9xl font-black text-[var(--color-ink-900)] leading-none tracking-widest"
+              style={{ animation: 'titleReveal 1.2s cubic-bezier(0.16,1,0.3,1) 0.3s both' }}
+            >
+              太極
+            </h1>
+
+            {/* 副标题 — 第 3 层，0.6s */}
+            <div
+              className="mt-5 text-xs tracking-[0.6em] text-[var(--color-ink-400)] font-serif"
+              style={{ animation: 'fadeUp 0.8s cubic-bezier(0.16,1,0.3,1) 0.6s both' }}
+            >
+              易 经 决 策 框 架
+            </div>
+
+            {/* 古典分割线 — 第 4 层，0.9s */}
+            <div
+              className="divider-classical w-72 mt-8"
+              style={{ animation: 'fadeUp 0.8s cubic-bezier(0.16,1,0.3,1) 0.9s both' }}
+            >
+              <span className="font-serif">☰ ☷</span>
+            </div>
+          </div>
+
+          {/* 引言 — 第 5 层，1.1s */}
+          <p
+            className="mt-10 text-[var(--color-ink-600)] max-w-md mx-auto leading-[2] font-serif text-base"
+            style={{ animation: 'fadeUp 0.8s cubic-bezier(0.16,1,0.3,1) 1.1s both' }}
+          >
+            以 <span className="text-[var(--color-vermillion)] font-semibold">六十四卦</span>{' '}
+            为情境原型
+            <br />取<span className="text-[var(--color-ink-900)] font-semibold">义理</span>而非占卜
+            <br />
+            <span className="text-[var(--color-ink-400)] text-sm">
+              述你所处之局，观三千年决策智慧如何解之
+            </span>
+          </p>
+        </header>
+
+        {/* ——— Input ——— */}
+        <section
+          className="mb-16"
+          style={{ animation: 'fadeUp 0.8s cubic-bezier(0.16,1,0.3,1) 1.4s both' }}
+        >
+          <div className="card-classical rounded-lg corner-ornament input-glow transition-shadow duration-300">
+            <div className="p-1">
+              <textarea
+                value={situation}
+                onChange={(e) => setSituation(e.target.value)}
+                placeholder={
+                  '述你之局，越详则越准。\n\n例：我在大厂工作五年，想辞职创业。积蓄不多，方向未明。\n日日上班如虚度，然真要走又恐决策有误。'
+                }
+                rows={7}
+                className="w-full p-6 bg-transparent resize-none outline-none text-[var(--color-ink-900)] placeholder:text-[var(--color-ink-400)] placeholder:font-serif leading-loose font-serif text-base transition-colors duration-200"
+                maxLength={2000}
+              />
+              <div className="flex items-center justify-between px-6 pb-5 pt-2 border-t border-[var(--color-ink-100)]">
+                <div className="flex items-center gap-3">
+                  <span className="text-xs text-[var(--color-ink-400)] font-mono tabular-nums">
+                    {situation.length} / 2000
+                  </span>
+                  {situation.length > 0 && (
+                    <div className="h-1 w-16 bg-[var(--color-ink-100)] rounded-full overflow-hidden">
+                      <div
+                        className="h-full rounded-full transition-all duration-300"
+                        style={{
+                          width: `${Math.min((situation.length / 2000) * 100, 100)}%`,
+                          background:
+                            situation.length > 100 ? 'var(--color-gold)' : 'var(--color-ink-400)',
+                        }}
+                      />
+                    </div>
+                  )}
+                </div>
+                <button
+                  onClick={(e) => {
+                    handleSubmit()
+                    // 墨水涟漪
+                    const btn = e.currentTarget
+                    const rect = btn.getBoundingClientRect()
+                    const x = e.clientX - rect.left
+                    const y = e.clientY - rect.top
+                    const ripple = document.createElement('span')
+                    ripple.style.cssText = `position:absolute;left:${x}px;top:${y}px;width:0;height:0;border-radius:50%;background:rgba(245,240,232,0.2);transform:translate(-50%,-50%);pointer-events:none;animation:ink-ripple 0.6s ease-out forwards;`
+                    btn.style.position = 'relative'
+                    btn.style.overflow = 'hidden'
+                    btn.appendChild(ripple)
+                    setTimeout(() => ripple.remove(), 700)
+                  }}
+                  disabled={loading || !situation.trim()}
+                  className="btn-classical inline-flex items-center gap-3 px-8 py-3 rounded disabled:opacity-40 disabled:cursor-not-allowed text-sm font-serif tracking-widest group"
+                >
+                  <span className="text-xl leading-none transition-transform duration-200 group-hover:scale-110 group-hover:rotate-3">
+                    筮
+                  </span>
+                  <span>问卦</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* 示例 */}
+          <div className="mt-6 flex flex-wrap items-center gap-2">
+            <span className="text-xs text-[var(--color-ink-400)] font-serif py-1.5">
+              试以此局问之 ——
+            </span>
+            {SAMPLE_SITUATIONS.map((s, i) => (
+              <button
+                key={i}
+                onClick={() => setSituation(s.text)}
+                className="text-xs px-4 py-2 border border-[var(--color-ink-200)] rounded hover:border-[var(--color-vermillion)] hover:text-[var(--color-vermillion)] hover:shadow-[0_0_12px_rgba(196,80,58,0.1)] text-[var(--color-ink-600)] transition-all duration-200 font-serif active:scale-95"
+                style={{
+                  animation: `fadeUp 0.5s cubic-bezier(0.16,1,0.3,1) ${1.6 + i * 0.08}s both`,
+                }}
+              >
+                {s.label}
+              </button>
+            ))}
+          </div>
+        </section>
+
+        {/* ——— Loading ——— */}
+        {loading && <DivinationLoader />}
+
+        {/* ——— Error ——— */}
+        {error && (
+          <div className="mb-8 p-5 border-2 border-[var(--color-vermillion)] bg-[var(--color-vermillion-bg)] rounded text-[var(--color-vermillion-dark)] text-sm font-serif animate-fade-up">
+            {error}
+          </div>
+        )}
+
+        {/* ——— Results ——— */}
+        {result && (
+          <section>
+            <div className="divider-classical mb-10 animate-fade-up">
+              <span className="font-serif">卦 · 象 · 辞</span>
+            </div>
+
+            <header className="flex items-baseline justify-between mb-8 animate-fade-up">
+              <h2 className="font-serif text-3xl text-[var(--color-ink-900)] tracking-wider">
+                三卦应之
+              </h2>
+              <span className="text-xs text-[var(--color-ink-400)] font-serif">展之以观全释</span>
+            </header>
+
+            {/* 抽取的特征 */}
+            {(Object.keys(result.extractedFeatures).length > 0 ||
+              result.extractedKeywords.length > 0) && (
+              <details className="text-xs text-[var(--color-ink-400)] bg-[var(--color-paper-light)] border border-[var(--color-ink-100)] rounded p-4 mb-8 animate-fade-up">
+                <summary className="cursor-pointer hover:text-[var(--color-ink-600)] font-serif tracking-wide">
+                  观系统所取之象
+                </summary>
+                <div className="mt-3 space-y-2">
+                  {Object.keys(result.extractedFeatures).length > 0 && (
+                    <div>
+                      <span className="font-medium font-serif">情境之象：</span>
+                      {Object.entries(result.extractedFeatures).map(([k, v]) => (
+                        <code
+                          key={k}
+                          className="ml-2 px-2 py-1 bg-[var(--color-paper)] rounded text-[var(--color-ink-600)]"
+                        >
+                          {k}＝{String(v)}
+                        </code>
+                      ))}
+                    </div>
+                  )}
+                  {result.extractedKeywords.length > 0 && (
+                    <div>
+                      <span className="font-medium font-serif">关键之词：</span>
+                      {result.extractedKeywords.map((kw, i) => (
+                        <code
+                          key={i}
+                          className="ml-2 px-2 py-1 bg-[var(--color-paper)] rounded text-[var(--color-ink-600)]"
+                        >
+                          {kw}
+                        </code>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </details>
+            )}
+
+            <div className="space-y-6">
+              {result.matches.map((m, i) => (
+                <div key={m.hexagram.number} className={`animate-stagger-${i + 1}`}>
+                  <MatchCard match={m} rank={i + 1} />
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* ——— Footer ——— */}
+        <footer className="mt-32 text-center">
+          <div className="divider-classical mb-10">
+            <span className="font-serif text-lg">☯</span>
+          </div>
+          <div className="space-y-5">
+            <p className="font-serif text-[var(--color-ink-600)] text-sm">
+              <span className="seal">义理派</span>
+            </p>
+            <p className="font-serif text-[var(--color-ink-400)] text-xs leading-[2.2] max-w-sm mx-auto">
+              易者，象也
+              <br />
+              六十四卦，六十四种情境之象
+              <br />
+              此器不卜未来，唯识当下
+              <br />
+              同输入恒得同输出，确定而可验
+            </p>
+            <div className="flex items-center justify-center gap-3 pt-4">
+              <span className="w-8 h-px bg-[var(--color-ink-200)]" />
+              <span className="text-[var(--color-ink-400)] font-mono text-[10px] tracking-[0.3em]">
+                v0.1 · 3/64
+              </span>
+              <span className="w-8 h-px bg-[var(--color-ink-200)]" />
+            </div>
+          </div>
+        </footer>
+      </div>
+    </>
+  )
+}
