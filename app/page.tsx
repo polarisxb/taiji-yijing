@@ -141,16 +141,20 @@ export default function Home() {
         >
           <div className="card-classical rounded-lg corner-ornament input-glow transition-shadow duration-300">
             <div className="p-1">
-              <textarea
-                value={situation}
-                onChange={(e) => setSituation(e.target.value)}
-                placeholder={
-                  '述你之局，越详则越准。\n\n例：我在大厂工作五年，想辞职创业。积蓄不多，方向未明。\n日日上班如虚度，然真要走又恐决策有误。'
-                }
-                rows={7}
-                className="w-full p-6 bg-transparent resize-none outline-none text-[var(--color-ink-900)] placeholder:text-[var(--color-ink-400)] placeholder:font-serif leading-loose font-serif text-base transition-colors duration-200"
-                maxLength={2000}
-              />
+              <div className="relative">
+                <textarea
+                  value={situation}
+                  onChange={(e) => setSituation(e.target.value)}
+                  placeholder={
+                    '述你之局，越详则越准。\n\n例：我在大厂工作五年，想辞职创业。积蓄不多，方向未明。\n日日上班如虚度，然真要走又恐决策有误。'
+                  }
+                  rows={7}
+                  className="w-full p-6 bg-transparent resize-none outline-none text-[var(--color-ink-900)] placeholder:text-[var(--color-ink-400)] placeholder:font-serif leading-loose font-serif text-base transition-colors duration-200"
+                  maxLength={2000}
+                  style={{ boxShadow: 'inset 0 2px 8px rgba(26,22,16,0.03)' }}
+                />
+                <div className="absolute bottom-0 left-4 right-4 h-6 pointer-events-none bg-gradient-to-t from-[var(--color-paper-light)] to-transparent" />
+              </div>
               <div className="flex items-center justify-between px-6 pb-5 pt-2 border-t border-[var(--color-ink-100)]">
                 <div className="flex items-center gap-3">
                   <span className="text-xs text-[var(--color-ink-400)] font-mono tabular-nums">
@@ -168,16 +172,25 @@ export default function Home() {
                       />
                     </div>
                   )}
-                  <div className="flex items-center gap-1 ml-3">
+                  <div className="relative flex items-center gap-0 ml-3 rounded-full bg-[var(--color-ink-100)] p-[2px]">
+                    <div
+                      className="absolute top-[2px] bottom-[2px] rounded-full transition-all duration-300 ease-out"
+                      style={{
+                        left: mode === 'ai' ? '2px' : '50%',
+                        width: 'calc(50% - 2px)',
+                        background:
+                          mode === 'ai' ? 'var(--color-vermillion)' : 'var(--color-ink-700)',
+                      }}
+                    />
                     <button
                       onClick={() => setMode('ai')}
-                      className={`text-[10px] px-2 py-1 rounded font-serif transition-colors ${mode === 'ai' ? 'bg-[var(--color-vermillion)] text-white' : 'text-[var(--color-ink-400)] hover:text-[var(--color-ink-600)]'}`}
+                      className={`relative z-10 text-[10px] px-3 py-1 rounded-full font-serif transition-colors duration-200 ${mode === 'ai' ? 'text-white' : 'text-[var(--color-ink-500)]'}`}
                     >
                       AI
                     </button>
                     <button
                       onClick={() => setMode('classic')}
-                      className={`text-[10px] px-2 py-1 rounded font-serif transition-colors ${mode === 'classic' ? 'bg-[var(--color-ink-600)] text-white' : 'text-[var(--color-ink-400)] hover:text-[var(--color-ink-600)]'}`}
+                      className={`relative z-10 text-[10px] px-3 py-1 rounded-full font-serif transition-colors duration-200 ${mode === 'classic' ? 'text-white' : 'text-[var(--color-ink-500)]'}`}
                     >
                       经典
                     </button>
@@ -242,15 +255,26 @@ export default function Home() {
 
         {/* ——— AI Results ——— */}
         {mode === 'ai' && ai.matchData && aiHexagram && (
-          <section className="animate-fade-up">
-            <div className="divider-classical mb-10">
+          <section>
+            <div
+              className="divider-classical divider-animated mb-10"
+              style={{ animation: 'fadeUp 0.6s cubic-bezier(0.16,1,0.3,1) 0s both' }}
+            >
               <span className="font-serif">卦 · 象 · 辞</span>
             </div>
 
-            <div className="card-classical rounded-lg p-8">
+            <div
+              className="card-classical rounded-lg p-8"
+              style={{ animation: 'fadeUp 0.7s cubic-bezier(0.16,1,0.3,1) 0.15s both' }}
+            >
               {/* 卦首 */}
               <div className="flex items-center gap-6 mb-6">
-                <HexagramSymbol binary={aiHexagram.binary} size="lg" />
+                <div
+                  className="hexagram-display flex items-center justify-center w-20 h-20 rounded-lg"
+                  style={{ animation: 'breathe 3s ease-in-out infinite' }}
+                >
+                  <HexagramSymbol binary={aiHexagram.binary} size="lg" />
+                </div>
                 <div>
                   <h2 className="font-serif text-3xl text-[var(--color-ink-900)] tracking-wider">
                     {aiHexagram.name.chinese}

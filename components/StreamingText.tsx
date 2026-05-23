@@ -15,7 +15,17 @@ export function StreamingText({ text, done = false, className = '' }: Props) {
     >
       {text}
       {!done && (
-        <span className="inline-block w-0.5 h-4 bg-[var(--color-vermillion)] ml-0.5 animate-pulse align-middle" />
+        <span
+          className="inline-block ml-0.5 align-middle animate-pulse"
+          style={{
+            width: 0,
+            height: 0,
+            borderLeft: '3px solid transparent',
+            borderRight: '3px solid transparent',
+            borderTop: '10px solid var(--color-vermillion)',
+            opacity: 0.8,
+          }}
+        />
       )}
     </div>
   )

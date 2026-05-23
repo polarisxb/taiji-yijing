@@ -39,7 +39,16 @@ export function ReasoningPanel({ reasoning, confidence }: Props) {
         </span>
       </button>
       <SmoothExpand open={open} duration={300}>
-        <div className="mt-3 pl-4 border-l-2 border-[var(--color-ink-100)] text-sm text-[var(--color-ink-600)] font-serif leading-[2.2] whitespace-pre-wrap">
+        <div
+          className="mt-3 pl-4 text-sm text-[var(--color-ink-600)] font-serif leading-[2.2] whitespace-pre-wrap"
+          style={{
+            borderLeft: '2px solid var(--color-vermillion)',
+            borderImage:
+              'linear-gradient(to bottom, var(--color-vermillion), var(--color-gold-light)) 1',
+            opacity: open ? 1 : 0,
+            transition: 'opacity 0.4s ease 0.1s',
+          }}
+        >
           {reasoning}
         </div>
       </SmoothExpand>
