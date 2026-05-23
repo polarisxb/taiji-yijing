@@ -16,9 +16,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           rel="stylesheet"
         />
       </head>
-      <body className="min-h-screen antialiased">
-        <div className="animate-page-enter">{children}</div>
-      </body>
+      <body className="min-h-screen antialiased animate-page-enter">{children}</body>
     </html>
   )
 }
