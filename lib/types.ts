@@ -172,6 +172,19 @@ export type Hexagram = {
 
   // 跨文化锚点
   parallels: CrossCulturalParallel
+
+  // 卦象关系（用于详情页「卦象之脉」）
+  relations?: HexagramRelation[]
+}
+
+// ============================================================
+// 卦象关系
+// ============================================================
+
+export type HexagramRelation = {
+  type: 'complementary' | 'inverse' | 'nuclear' | 'sequence'
+  targetNumber: number
+  narrative: string
 }
 
 // ============================================================

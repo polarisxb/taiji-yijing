@@ -477,3 +477,70 @@ body {
   background: rgba(196, 80, 58, 0.15);
   color: var(--color-ink-900);
 }
+
+/* ——— 经文大字排版 ——— */
+.classical-large {
+  font-family: var(--font-serif);
+  font-size: 1.5rem;
+  line-height: 2.4;
+  letter-spacing: 0.15em;
+  text-align: center;
+  color: var(--color-ink-800);
+}
+
+/* ——— 爻时间线 ——— */
+.yao-timeline {
+  position: relative;
+  padding-left: 2rem;
+}
+.yao-timeline::before {
+  content: '';
+  position: absolute;
+  left: 0.75rem;
+  top: 1rem;
+  bottom: 1rem;
+  width: 2px;
+  background: linear-gradient(to bottom, var(--color-ink-200), var(--color-ink-100));
+}
+
+.yao-node {
+  position: relative;
+  padding-left: 1.5rem;
+  padding-bottom: 0.5rem;
+}
+.yao-node::before {
+  content: '';
+  position: absolute;
+  left: -1.6rem;
+  top: 0.85rem;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 2px solid var(--color-ink-200);
+  background: var(--color-paper-light);
+  transition: all 0.25s ease;
+}
+.yao-node:hover::before {
+  border-color: var(--color-gold);
+}
+.yao-node-active::before {
+  border-color: var(--color-vermillion);
+  background: var(--color-vermillion);
+  box-shadow: 0 0 8px rgba(196, 80, 58, 0.3);
+}
+
+/* ——— 阶段高亮提示 ——— */
+.phase-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.15rem 0.5rem;
+  background: var(--color-vermillion-bg);
+  border: 1px solid var(--color-vermillion);
+  border-radius: 2px;
+  color: var(--color-vermillion);
+  font-family: var(--font-serif);
+  font-size: 0.65rem;
+  letter-spacing: 0.1em;
+  animation: breathe 2s ease-in-out infinite;
+}

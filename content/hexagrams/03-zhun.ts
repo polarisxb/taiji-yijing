@@ -269,4 +269,12 @@ export const zhun: Hexagram = {
       },
     ],
   },
+
+  relations: [
+    {
+      type: 'sequence',
+      targetNumber: 1,
+      narrative: '屯承乾坤 — 天地既成，万物初生。创始的能量已有，但秩序未立。',
+    },
+  ],
 }

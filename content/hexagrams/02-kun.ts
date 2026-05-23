@@ -261,4 +261,17 @@ export const kun: Hexagram = {
       },
     ],
   },
+
+  relations: [
+    {
+      type: 'complementary',
+      targetNumber: 1,
+      narrative: '坤乾相对 — 承载与创造，顺势而为与主动出击，互为表里。',
+    },
+    {
+      type: 'sequence',
+      targetNumber: 3,
+      narrative: '乾坤之后为屯 — 天地初开，万物草创，创业之难由此始。',
+    },
+  ],
 }

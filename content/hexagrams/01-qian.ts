@@ -266,4 +266,12 @@ export const qian: Hexagram = {
       },
     ],
   },
+
+  relations: [
+    {
+      type: 'complementary',
+      targetNumber: 2,
+      narrative: '乾坤相对 — 纯阳与纯阴，创造与承载，是万物的两极。',
+    },
+  ],
 }

@@ -6,6 +6,7 @@ import type { MatchResult, Yao } from '@/lib/types'
 import { HexagramSymbol } from './HexagramSymbol'
 import { SmoothExpand } from './SmoothExpand'
 import { useCountUp, useScrollReveal } from '@/hooks/useAnimations'
+import Link from 'next/link'
 
 type Props = {
   match: MatchResult
@@ -196,6 +197,16 @@ export function MatchCard({ match, rank }: Props) {
                 </div>
               </Section>
             )}
+
+          <div className="px-6 py-4 border-t border-[var(--color-ink-100)]">
+            <Link
+              href={`/hexagram/${hexagram.number}?from=consult`}
+              className="inline-flex items-center gap-2 text-xs font-serif text-[var(--color-ink-600)] hover:text-[var(--color-vermillion)] transition-colors duration-200"
+            >
+              <span>深入此卦</span>
+              <span>→</span>
+            </Link>
+          </div>
 
           <div className="px-6 py-3 text-[10px] text-[var(--color-ink-400)] flex gap-6 font-mono border-t border-[var(--color-ink-100)]">
             <ScoreChip label="词" value={score.keyword} active={visible} />
