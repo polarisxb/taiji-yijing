@@ -9,10 +9,19 @@ import { getPhaseYaoIndex } from '@/lib/hexagram-utils'
 type Props = {
   hexagram: Hexagram
   highlightPhase?: Phase
+  highlightYao?: number
+  yaoConfidence?: 'high' | 'medium' | 'low'
+  yaoBrief?: string
 }
 
-export function YaoTimeline({ hexagram, highlightPhase }: Props) {
-  const autoIndex = getPhaseYaoIndex(highlightPhase)
+const CONFIDENCE_TEXT: Record<string, string> = {
+  high: '高',
+  medium: '中',
+  low: '低',
+}
+
+export function YaoTimeline({ hexagram, highlightPhase, highlightYao, yaoConfidence, yaoBrief }: Props) {
+  const autoIndex = highlightYao !== undefined ? highlightYao - 1 : getPhaseYaoIndex(highlightPhase) ?? null
   const [openIndex, setOpenIndex] = useState<number | null>(autoIndex ?? null)
 
   // yao 数组是 position 1-6（初到上），展示从上到下所以反转
@@ -25,12 +34,21 @@ export function YaoTimeline({ hexagram, highlightPhase }: Props) {
           <span className="font-serif tracking-widest">六爻 · 事之六阶</span>
         </div>
 
-        {highlightPhase && autoIndex !== undefined && (
+        {autoIndex !== null && (
           <div className="text-center mb-8">
             <span className="phase-indicator">
               <span>◉</span>
               系统判断你可能处于第{autoIndex + 1}爻阶段
+              {yaoConfidence && (
+                <span className="ml-1 opacity-70">（{CONFIDENCE_TEXT[yaoConfidence] ?? '中'}置信）</span>
+              )}
             </span>
+            {yaoBrief && (
+              <p className="mt-2 text-xs text-[var(--color-ink-500)] font-serif">{yaoBrief}</p>
+            )}
+            <p className="mt-1 text-[10px] text-[var(--color-ink-400)] font-serif">
+              不太对？点击其他爻位查看
+            </p>
           </div>
         )}
 

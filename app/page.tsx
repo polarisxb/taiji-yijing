@@ -1,10 +1,16 @@
 'use client'
 
 import { useState } from 'react'
+import Link from 'next/link'
 import { MatchCard } from '@/components/MatchCard'
 import { TaijiSymbol } from '@/components/TaijiSymbol'
 import { Atmosphere } from '@/components/Atmosphere'
 import { DivinationLoader } from '@/components/DivinationLoader'
+import { HexagramSymbol } from '@/components/HexagramSymbol'
+import { ReasoningPanel } from '@/components/ReasoningPanel'
+import { StreamingText } from '@/components/StreamingText'
+import { useStreamingConsult } from '@/hooks/useStreamingConsult'
+import { findHexagramByNumber } from '@/lib/hexagram-utils'
 import type { ConsultResponse } from '@/lib/types'
 
 const SAMPLE_SITUATIONS = [
@@ -28,15 +34,22 @@ const SAMPLE_SITUATIONS = [
 
 export default function Home() {
   const [situation, setSituation] = useState('')
-  const [loading, setLoading] = useState(false)
-  const [result, setResult] = useState<ConsultResponse | null>(null)
-  const [error, setError] = useState<string | null>(null)
+  const [mode, setMode] = useState<'classic' | 'ai'>('ai')
 
-  async function handleSubmit() {
+  // Classic mode state
+  const [classicLoading, setClassicLoading] = useState(false)
+  const [classicResult, setClassicResult] = useState<ConsultResponse | null>(null)
+  const [classicError, setClassicError] = useState<string | null>(null)
+
+  // AI mode state
+  const ai = useStreamingConsult()
+  const aiHexagram = ai.matchData ? findHexagramByNumber(ai.matchData.hexagramNumber) : null
+
+  async function handleClassicSubmit() {
     if (!situation.trim()) return
-    setLoading(true)
-    setError(null)
-    setResult(null)
+    setClassicLoading(true)
+    setClassicError(null)
+    setClassicResult(null)
     try {
       const res = await fetch('/api/consult', {
         method: 'POST',
@@ -48,13 +61,25 @@ export default function Home() {
         throw new Error(data?.error ?? `请求失败：${res.status}`)
       }
       const data = (await res.json()) as ConsultResponse
-      setResult(data)
+      setClassicResult(data)
     } catch (e) {
-      setError(e instanceof Error ? e.message : '未知错误')
+      setClassicError(e instanceof Error ? e.message : '未知错误')
     } finally {
-      setLoading(false)
+      setClassicLoading(false)
     }
   }
+
+  function handleSubmit() {
+    if (!situation.trim()) return
+    if (mode === 'ai') {
+      ai.submit(situation.trim())
+    } else {
+      handleClassicSubmit()
+    }
+  }
+
+  const loading = mode === 'ai' ? ai.loading : classicLoading
+  const error = mode === 'ai' ? ai.error : classicError
 
   return (
     <>
@@ -143,6 +168,20 @@ export default function Home() {
                       />
                     </div>
                   )}
+                  <div className="flex items-center gap-1 ml-3">
+                    <button
+                      onClick={() => setMode('ai')}
+                      className={`text-[10px] px-2 py-1 rounded font-serif transition-colors ${mode === 'ai' ? 'bg-[var(--color-vermillion)] text-white' : 'text-[var(--color-ink-400)] hover:text-[var(--color-ink-600)]'}`}
+                    >
+                      AI
+                    </button>
+                    <button
+                      onClick={() => setMode('classic')}
+                      className={`text-[10px] px-2 py-1 rounded font-serif transition-colors ${mode === 'classic' ? 'bg-[var(--color-ink-600)] text-white' : 'text-[var(--color-ink-400)] hover:text-[var(--color-ink-600)]'}`}
+                    >
+                      经典
+                    </button>
+                  </div>
                 </div>
                 <button
                   onClick={(e) => {
@@ -201,8 +240,60 @@ export default function Home() {
           </div>
         )}
 
-        {/* ——— Results ——— */}
-        {result && (
+        {/* ——— AI Results ——— */}
+        {mode === 'ai' && ai.matchData && aiHexagram && (
+          <section className="animate-fade-up">
+            <div className="divider-classical mb-10">
+              <span className="font-serif">卦 · 象 · 辞</span>
+            </div>
+
+            <div className="card-classical rounded-lg p-8">
+              {/* 卦首 */}
+              <div className="flex items-center gap-6 mb-6">
+                <HexagramSymbol binary={aiHexagram.binary} size="lg" />
+                <div>
+                  <h2 className="font-serif text-3xl text-[var(--color-ink-900)] tracking-wider">
+                    {aiHexagram.name.chinese}
+                  </h2>
+                  <p className="text-sm text-[var(--color-ink-400)] font-serif mt-1">
+                    {aiHexagram.name.pinyin} · 第{aiHexagram.number}卦
+                  </p>
+                </div>
+              </div>
+
+              {/* 推理面板 */}
+              <ReasoningPanel reasoning={ai.matchData.reasoning} confidence={ai.matchData.confidence} />
+
+              {/* 个性化解读 */}
+              {ai.interpretation && (
+                <div className="mt-6 pt-6 border-t border-[var(--color-ink-100)]">
+                  <div className="text-[10px] tracking-[0.2em] text-[var(--color-ink-400)] mb-3 font-serif">
+                    专属解读
+                  </div>
+                  <StreamingText text={ai.interpretation} done={ai.done} />
+                </div>
+              )}
+
+              {/* 深入此卦 */}
+              <div className="mt-6 pt-6 border-t border-[var(--color-ink-100)] flex items-center justify-between">
+                <Link
+                  href={`/hexagram/${aiHexagram.number}?phase=${ai.matchData.yaoPosition}`}
+                  className="text-sm text-[var(--color-vermillion)] font-serif hover:underline"
+                >
+                  深入此卦 →
+                </Link>
+                {ai.matchData.yaoConfidence && (
+                  <span className="text-[10px] text-[var(--color-ink-400)] font-serif">
+                    第{ai.matchData.yaoPosition}爻 · {ai.matchData.yaoBrief}
+                  </span>
+                )}
+              </div>
+            </div>
+          </section>
+        )}
+
+        {/* ——— Classic Results ——— */}
+        {mode === 'classic' && classicResult && (
           <section>
             <div className="divider-classical mb-10 animate-fade-up">
               <span className="font-serif">卦 · 象 · 辞</span>
@@ -215,18 +306,17 @@ export default function Home() {
               <span className="text-xs text-[var(--color-ink-400)] font-serif">展之以观全释</span>
             </header>
 
-            {/* 抽取的特征 */}
-            {(Object.keys(result.extractedFeatures).length > 0 ||
-              result.extractedKeywords.length > 0) && (
+            {(Object.keys(classicResult.extractedFeatures).length > 0 ||
+              classicResult.extractedKeywords.length > 0) && (
               <details className="text-xs text-[var(--color-ink-400)] bg-[var(--color-paper-light)] border border-[var(--color-ink-100)] rounded p-4 mb-8 animate-fade-up">
                 <summary className="cursor-pointer hover:text-[var(--color-ink-600)] font-serif tracking-wide">
                   观系统所取之象
                 </summary>
                 <div className="mt-3 space-y-2">
-                  {Object.keys(result.extractedFeatures).length > 0 && (
+                  {Object.keys(classicResult.extractedFeatures).length > 0 && (
                     <div>
                       <span className="font-medium font-serif">情境之象：</span>
-                      {Object.entries(result.extractedFeatures).map(([k, v]) => (
+                      {Object.entries(classicResult.extractedFeatures).map(([k, v]) => (
                         <code
                           key={k}
                           className="ml-2 px-2 py-1 bg-[var(--color-paper)] rounded text-[var(--color-ink-600)]"
@@ -236,10 +326,10 @@ export default function Home() {
                       ))}
                     </div>
                   )}
-                  {result.extractedKeywords.length > 0 && (
+                  {classicResult.extractedKeywords.length > 0 && (
                     <div>
                       <span className="font-medium font-serif">关键之词：</span>
-                      {result.extractedKeywords.map((kw, i) => (
+                      {classicResult.extractedKeywords.map((kw, i) => (
                         <code
                           key={i}
                           className="ml-2 px-2 py-1 bg-[var(--color-paper)] rounded text-[var(--color-ink-600)]"
@@ -254,7 +344,7 @@ export default function Home() {
             )}
 
             <div className="space-y-6">
-              {result.matches.map((m, i) => (
+              {classicResult.matches.map((m, i) => (
                 <div key={m.hexagram.number} className={`animate-stagger-${i + 1}`}>
                   <MatchCard match={m} rank={i + 1} />
                 </div>
