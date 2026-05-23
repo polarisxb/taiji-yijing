@@ -12,23 +12,23 @@
 
 ## File Structure
 
-| 文件 | 职责 |
-|------|------|
-| **Create:** `lib/ai/deepseek.ts` | DeepSeek provider 配置 |
-| **Create:** `lib/ai/schemas.ts` | Zod schemas（特征、精判、爻位输出） |
-| **Create:** `lib/ai/prompts.ts` | System prompts（5 个模块） |
-| **Create:** `lib/ai/embedding.ts` | Embedding 预计算 + cosine similarity |
-| **Create:** `lib/ai/consult-agent.ts` | Agent 主流程编排 |
-| **Create:** `app/api/consult-ai/route.ts` | 流式 API 端点 |
-| **Create:** `components/ReasoningPanel.tsx` | 可折叠推理面板 |
-| **Create:** `components/StreamingText.tsx` | 流式打字机渲染 |
-| **Create:** `hooks/useStreamingConsult.ts` | SSE 流式 hook |
-| **Create:** `__tests__/ai-schemas.test.ts` | Schema 单元测试 |
-| **Create:** `__tests__/ai-embedding.test.ts` | Embedding 工具测试 |
-| **Modify:** `app/page.tsx` | 切换到 AI 问卦流程 |
-| **Modify:** `components/MatchCard.tsx` | 加推理折叠区 |
-| **Modify:** `components/hexagram/YaoTimeline.tsx` | 加置信度标签 |
-| **Create:** `.env.local` | DeepSeek API Key |
+| 文件                                              | 职责                                 |
+| ------------------------------------------------- | ------------------------------------ |
+| **Create:** `lib/ai/deepseek.ts`                  | DeepSeek provider 配置               |
+| **Create:** `lib/ai/schemas.ts`                   | Zod schemas（特征、精判、爻位输出）  |
+| **Create:** `lib/ai/prompts.ts`                   | System prompts（5 个模块）           |
+| **Create:** `lib/ai/embedding.ts`                 | Embedding 预计算 + cosine similarity |
+| **Create:** `lib/ai/consult-agent.ts`             | Agent 主流程编排                     |
+| **Create:** `app/api/consult-ai/route.ts`         | 流式 API 端点                        |
+| **Create:** `components/ReasoningPanel.tsx`       | 可折叠推理面板                       |
+| **Create:** `components/StreamingText.tsx`        | 流式打字机渲染                       |
+| **Create:** `hooks/useStreamingConsult.ts`        | SSE 流式 hook                        |
+| **Create:** `__tests__/ai-schemas.test.ts`        | Schema 单元测试                      |
+| **Create:** `__tests__/ai-embedding.test.ts`      | Embedding 工具测试                   |
+| **Modify:** `app/page.tsx`                        | 切换到 AI 问卦流程                   |
+| **Modify:** `components/MatchCard.tsx`            | 加推理折叠区                         |
+| **Modify:** `components/hexagram/YaoTimeline.tsx` | 加置信度标签                         |
+| **Create:** `.env.local`                          | DeepSeek API Key                     |
 
 ---
 
@@ -118,11 +118,7 @@ git commit -m "feat: add DeepSeek provider config"
 ```typescript
 // __tests__/ai-schemas.test.ts
 import { describe, it, expect } from 'vitest'
-import {
-  situationFeaturesSchema,
-  cotJudgmentSchema,
-  yaoPositioningSchema,
-} from '@/lib/ai/schemas'
+import { situationFeaturesSchema, cotJudgmentSchema, yaoPositioningSchema } from '@/lib/ai/schemas'
 
 describe('situationFeaturesSchema', () => {
   it('parses valid features', () => {
@@ -199,26 +195,25 @@ import { z } from 'zod'
 export const situationFeaturesSchema = z.object({
   archetype: z
     .enum([
-      'creating', 'sustaining', 'transforming', 'dissolving',
-      'waiting', 'advancing', 'retreating', 'conflicting',
-      'uniting', 'separating', 'learning', 'leading',
+      'creating',
+      'sustaining',
+      'transforming',
+      'dissolving',
+      'waiting',
+      'advancing',
+      'retreating',
+      'conflicting',
+      'uniting',
+      'separating',
+      'learning',
+      'leading',
     ])
     .optional(),
-  phase: z
-    .enum(['germinal', 'emerging', 'developing', 'peak', 'declining', 'ending'])
-    .optional(),
-  scale: z
-    .enum(['personal', 'interpersonal', 'team', 'organizational', 'societal'])
-    .optional(),
-  power: z
-    .enum(['dominant', 'advantaged', 'balanced', 'disadvantaged', 'subordinate'])
-    .optional(),
-  agency: z
-    .enum(['active', 'responsive', 'patient', 'submissive'])
-    .optional(),
-  risk: z
-    .enum(['low', 'moderate', 'high', 'existential'])
-    .optional(),
+  phase: z.enum(['germinal', 'emerging', 'developing', 'peak', 'declining', 'ending']).optional(),
+  scale: z.enum(['personal', 'interpersonal', 'team', 'organizational', 'societal']).optional(),
+  power: z.enum(['dominant', 'advantaged', 'balanced', 'disadvantaged', 'subordinate']).optional(),
+  agency: z.enum(['active', 'responsive', 'patient', 'submissive']).optional(),
+  risk: z.enum(['low', 'moderate', 'high', 'existential']).optional(),
 })
 
 export const cotJudgmentSchema = z.object({
@@ -531,7 +526,12 @@ async function extractFeatures(situation: string): Promise<Partial<SituationDime
 async function selectHexagram(
   situation: string,
   features: Partial<SituationDimension>,
-): Promise<{ hexagram: Hexagram; reasoning: string; confidence: 'high' | 'medium' | 'low'; runners: number[] }> {
+): Promise<{
+  hexagram: Hexagram
+  reasoning: string
+  confidence: 'high' | 'medium' | 'low'
+  runners: number[]
+}> {
   let candidates: Hexagram[]
 
   if (ALL_HEXAGRAMS.length < EMBEDDING_THRESHOLD) {
@@ -962,9 +962,8 @@ type Props = {
 修改组件内部，优先使用 `highlightYao`（AI 定位）而非 `highlightPhase`（URL 参数）：
 
 ```typescript
-const autoIndex = highlightYao !== undefined
-  ? highlightYao - 1
-  : getPhaseYaoIndex(highlightPhase) ?? null
+const autoIndex =
+  highlightYao !== undefined ? highlightYao - 1 : (getPhaseYaoIndex(highlightPhase) ?? null)
 ```
 
 在阶段高亮提示区域，如果有 AI 定位则显示置信度：
@@ -1012,6 +1011,7 @@ git commit -m "feat: add AI yao positioning with confidence to YaoTimeline"
 - [ ] **Step 1: 切换到 AI 流程**
 
 关键改动：
+
 1. 导入 `useStreamingConsult` 替代手动 fetch
 2. 导入 `findHexagramByNumber` 查找完整卦数据
 3. 匹配结果区域增加 `ReasoningPanel` 和 `StreamingText`
@@ -1031,6 +1031,7 @@ import { StreamingText } from '@/components/StreamingText'
 修改结果区域：匹配到卦后，显示匹配结果 + 推理面板 + 流式解读。
 
 具体 UI 结构：
+
 ```
 匹配结果区域：
 ├── 卦名 + 卦象（来自 matchData.hexagramNumber → findHexagramByNumber）
@@ -1080,6 +1081,7 @@ Expected: 构建成功
 Run: `npm run dev`
 
 验证：
+
 1. 首页输入情境 → 出现加载 → 显示匹配卦象
 2. 点击「为什么是这一卦？」→ 展开推理过程
 3. 个性化解读流式渲染（打字机效果）

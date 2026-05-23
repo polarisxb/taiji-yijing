@@ -17,15 +17,9 @@ export const situationFeaturesSchema = z.object({
       'leading',
     ])
     .optional(),
-  phase: z
-    .enum(['germinal', 'emerging', 'developing', 'peak', 'declining', 'ending'])
-    .optional(),
-  scale: z
-    .enum(['personal', 'interpersonal', 'team', 'organizational', 'societal'])
-    .optional(),
-  power: z
-    .enum(['dominant', 'advantaged', 'balanced', 'disadvantaged', 'subordinate'])
-    .optional(),
+  phase: z.enum(['germinal', 'emerging', 'developing', 'peak', 'declining', 'ending']).optional(),
+  scale: z.enum(['personal', 'interpersonal', 'team', 'organizational', 'societal']).optional(),
+  power: z.enum(['dominant', 'advantaged', 'balanced', 'disadvantaged', 'subordinate']).optional(),
   agency: z.enum(['active', 'responsive', 'patient', 'submissive']).optional(),
   risk: z.enum(['low', 'moderate', 'high', 'existential']).optional(),
 })

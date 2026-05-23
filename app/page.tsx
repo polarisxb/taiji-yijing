@@ -262,7 +262,10 @@ export default function Home() {
               </div>
 
               {/* 推理面板 */}
-              <ReasoningPanel reasoning={ai.matchData.reasoning} confidence={ai.matchData.confidence} />
+              <ReasoningPanel
+                reasoning={ai.matchData.reasoning}
+                confidence={ai.matchData.confidence}
+              />
 
               {/* 个性化解读 */}
               {ai.interpretation && (

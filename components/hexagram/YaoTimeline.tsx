@@ -20,8 +20,15 @@ const CONFIDENCE_TEXT: Record<string, string> = {
   low: '低',
 }
 
-export function YaoTimeline({ hexagram, highlightPhase, highlightYao, yaoConfidence, yaoBrief }: Props) {
-  const autoIndex = highlightYao !== undefined ? highlightYao - 1 : getPhaseYaoIndex(highlightPhase) ?? null
+export function YaoTimeline({
+  hexagram,
+  highlightPhase,
+  highlightYao,
+  yaoConfidence,
+  yaoBrief,
+}: Props) {
+  const autoIndex =
+    highlightYao !== undefined ? highlightYao - 1 : (getPhaseYaoIndex(highlightPhase) ?? null)
   const [openIndex, setOpenIndex] = useState<number | null>(autoIndex ?? null)
 
   // yao 数组是 position 1-6（初到上），展示从上到下所以反转
@@ -40,7 +47,9 @@ export function YaoTimeline({ hexagram, highlightPhase, highlightYao, yaoConfide
               <span>◉</span>
               系统判断你可能处于第{autoIndex + 1}爻阶段
               {yaoConfidence && (
-                <span className="ml-1 opacity-70">（{CONFIDENCE_TEXT[yaoConfidence] ?? '中'}置信）</span>
+                <span className="ml-1 opacity-70">
+                  （{CONFIDENCE_TEXT[yaoConfidence] ?? '中'}置信）
+                </span>
               )}
             </span>
             {yaoBrief && (

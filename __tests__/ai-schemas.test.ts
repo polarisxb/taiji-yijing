@@ -1,9 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import {
-  situationFeaturesSchema,
-  cotJudgmentSchema,
-  yaoPositioningSchema,
-} from '@/lib/ai/schemas'
+import { situationFeaturesSchema, cotJudgmentSchema, yaoPositioningSchema } from '@/lib/ai/schemas'
 
 describe('situationFeaturesSchema', () => {
   it('parses valid features', () => {

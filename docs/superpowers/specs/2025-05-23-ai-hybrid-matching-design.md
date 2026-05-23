@@ -5,6 +5,7 @@
 ## 一、目标
 
 将现有的纯规则匹配引擎升级为 AI 混合架构，实现：
+
 1. 语义级特征抽取（替代正则词典）
 2. 高精度卦象匹配（Embedding + CoT 推理）
 3. 精确爻位定位（先推断 + 可修正）
@@ -42,12 +43,12 @@
 
 ## 三、技术选型
 
-| 组件 | 选择 | 理由 |
-|------|------|------|
-| AI 框架 | Vercel AI SDK 6 | 与 Next.js 无缝集成、TypeScript 类型安全 |
-| LLM | DeepSeek (chat) | 中文最强之一、成本极低 |
-| Embedding | DeepSeek Embedding | 统一 API Key、中文表现好 |
-| Schema 约束 | Zod | AI SDK 原生支持、类型安全 |
+| 组件        | 选择               | 理由                                     |
+| ----------- | ------------------ | ---------------------------------------- |
+| AI 框架     | Vercel AI SDK 6    | 与 Next.js 无缝集成、TypeScript 类型安全 |
+| LLM         | DeepSeek (chat)    | 中文最强之一、成本极低                   |
+| Embedding   | DeepSeek Embedding | 统一 API Key、中文表现好                 |
+| Schema 约束 | Zod                | AI SDK 原生支持、类型安全                |
 
 ### API Key 管理
 
@@ -77,11 +78,13 @@ const result = await generateObject({
 ### 模块 ② Embedding 向量粗筛
 
 **预计算**（构建时或首次启动时）：
+
 - 每卦生成一段摘要文本（judgment.modernReading + appliesWhen + 核心特征）
 - 调用 DeepSeek Embedding API 得到向量
 - 缓存为 JSON 文件
 
 **查询时**：
+
 - 用户输入 → embedding → cosine similarity → top 5
 
 **开关**：`ALL_HEXAGRAMS.length < 20` 时跳过此模块，全量传给模块 ③。
@@ -89,6 +92,7 @@ const result = await generateObject({
 ### 模块 ③ LLM CoT 精判
 
 **System Prompt 核心**：
+
 ```
 你是一位义理派易经学者。不做占卜，只做情境模式匹配。
 
@@ -100,6 +104,7 @@ const result = await generateObject({
 ```
 
 **输出格式**（Structured Output）：
+
 ```typescript
 {
   selectedNumber: number        // 最终匹配的卦号
@@ -113,15 +118,17 @@ const result = await generateObject({
 
 **输入**：匹配到的卦 + 用户原始描述 + 6 爻完整内容
 **输出**：
+
 ```typescript
 {
-  yaoPosition: number          // 1-6
+  yaoPosition: number // 1-6
   confidence: 'high' | 'medium' | 'low'
-  brief: string               // 一句话解释为什么是这一爻
+  brief: string // 一句话解释为什么是这一爻
 }
 ```
 
 **前端交互**：
+
 - 默认高亮推断的爻位
 - 显示置信度标签
 - 用户点击其他爻 → 切换高亮（已有 YaoTimeline 组件支持）
@@ -130,14 +137,15 @@ const result = await generateObject({
 
 **分层约束策略**：
 
-| 内容层 | 约束级别 | 规则 |
-|--------|---------|------|
-| 卦辞、象传原文 | 🔒 不生成 | 直接引用内容文件，LLM 不参与 |
-| 义理解读 | 🔒 严格 | LLM 只能基于 classicalCommentary 内容润色 |
-| 情境映射 | 🔓 半开放 | LLM 可结合用户具体场景做类比延伸 |
-| 爻位建议 | 🔓 半开放 | 基于 yao.actionable + 用户情境生成个性化建议 |
+| 内容层         | 约束级别  | 规则                                         |
+| -------------- | --------- | -------------------------------------------- |
+| 卦辞、象传原文 | 🔒 不生成 | 直接引用内容文件，LLM 不参与                 |
+| 义理解读       | 🔒 严格   | LLM 只能基于 classicalCommentary 内容润色    |
+| 情境映射       | 🔓 半开放 | LLM 可结合用户具体场景做类比延伸             |
+| 爻位建议       | 🔓 半开放 | 基于 yao.actionable + 用户情境生成个性化建议 |
 
 **System Prompt 关键约束**：
+
 ```
 你是义理派易经学者。以下是这一卦的完整内容（由编辑团队审核）。
 
@@ -158,6 +166,7 @@ const result = await generateObject({
 与现有 `/api/consult` 并行，不替换。
 
 **Request**：
+
 ```typescript
 {
   situation: string
@@ -165,6 +174,7 @@ const result = await generateObject({
 ```
 
 **Response**（流式 SSE）：
+
 ```typescript
 // 第一段：匹配结果（快速返回）
 { type: 'match', data: { hexagram, reasoning, confidence, yaoPosition } }
@@ -197,20 +207,20 @@ DeepSeek API 不可用时 → 返回 `{ type: 'error', message: '服务暂时不
 
 ## 七、数据流文件映射
 
-| 文件 | 变更 |
-|------|------|
-| `lib/ai/deepseek.ts` | 新增：DeepSeek provider 配置 |
-| `lib/ai/schemas.ts` | 新增：Zod schemas（特征、精判、爻位） |
-| `lib/ai/prompts.ts` | 新增：System prompts（5 个模块） |
-| `lib/ai/embedding.ts` | 新增：Embedding 预计算 + 查询 |
-| `lib/ai/consult-agent.ts` | 新增：Agent 主流程编排 |
-| `app/api/consult-ai/route.ts` | 新增：流式 API 端点 |
-| `components/ConsultAI.tsx` | 新增：AI 问卦前端组件 |
-| `components/ReasoningPanel.tsx` | 新增：推理折叠面板 |
-| `components/StreamingText.tsx` | 新增：流式文本渲染 |
-| `hooks/useStreamingConsult.ts` | 新增：SSE 流式 hook |
-| `components/hexagram/YaoTimeline.tsx` | 修改：加置信度标签 |
-| `components/MatchCard.tsx` | 修改：加推理区 + 解读区 |
+| 文件                                  | 变更                                  |
+| ------------------------------------- | ------------------------------------- |
+| `lib/ai/deepseek.ts`                  | 新增：DeepSeek provider 配置          |
+| `lib/ai/schemas.ts`                   | 新增：Zod schemas（特征、精判、爻位） |
+| `lib/ai/prompts.ts`                   | 新增：System prompts（5 个模块）      |
+| `lib/ai/embedding.ts`                 | 新增：Embedding 预计算 + 查询         |
+| `lib/ai/consult-agent.ts`             | 新增：Agent 主流程编排                |
+| `app/api/consult-ai/route.ts`         | 新增：流式 API 端点                   |
+| `components/ConsultAI.tsx`            | 新增：AI 问卦前端组件                 |
+| `components/ReasoningPanel.tsx`       | 新增：推理折叠面板                    |
+| `components/StreamingText.tsx`        | 新增：流式文本渲染                    |
+| `hooks/useStreamingConsult.ts`        | 新增：SSE 流式 hook                   |
+| `components/hexagram/YaoTimeline.tsx` | 修改：加置信度标签                    |
+| `components/MatchCard.tsx`            | 修改：加推理区 + 解读区               |
 
 ## 八、升级路径
 
@@ -227,14 +237,14 @@ DeepSeek API 不可用时 → 返回 `{ type: 'error', message: '服务暂时不
 
 ## 九、成本估算
 
-| 模块 | 每次调用 tokens | 成本（DeepSeek） |
-|------|----------------|-----------------|
-| ① 特征抽取 | ~500 | ¥0.0005 |
-| ② Embedding | ~200 | ¥0.0001 |
-| ③ CoT 精判 | ~2000 | ¥0.002 |
-| ④ 爻位定位 | ~1000 | ¥0.001 |
-| ⑤ 个性化解读 | ~1500 | ¥0.0015 |
-| **合计** | **~5200** | **¥0.005/次** |
+| 模块         | 每次调用 tokens | 成本（DeepSeek） |
+| ------------ | --------------- | ---------------- |
+| ① 特征抽取   | ~500            | ¥0.0005          |
+| ② Embedding  | ~200            | ¥0.0001          |
+| ③ CoT 精判   | ~2000           | ¥0.002           |
+| ④ 爻位定位   | ~1000           | ¥0.001           |
+| ⑤ 个性化解读 | ~1500           | ¥0.0015          |
+| **合计**     | **~5200**       | **¥0.005/次**    |
 
 每次问卦约 5 厘钱。1000 次问卦 = ¥5。
 
