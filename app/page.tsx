@@ -7,10 +7,13 @@ import { TaijiSymbol } from '@/components/TaijiSymbol'
 import { Atmosphere } from '@/components/Atmosphere'
 import { DivinationLoader } from '@/components/DivinationLoader'
 import { HexagramSymbol } from '@/components/HexagramSymbol'
+import { InlineErrorState } from '@/components/InlineErrorState'
 import { ReasoningPanel } from '@/components/ReasoningPanel'
 import { StreamingText } from '@/components/StreamingText'
 import { HistoryNavLink } from '@/components/zheng/HistoryNavLink'
+import { SaveConsultationButton } from '@/components/zheng/SaveConsultationButton'
 import { useStreamingConsult } from '@/hooks/useStreamingConsult'
+import { confidenceToScore } from '@/lib/zheng/confidence'
 import { findHexagramByNumber } from '@/lib/hexagram-utils'
 import type { ConsultResponse } from '@/lib/types'
 
@@ -245,12 +248,40 @@ export default function Home() {
         </section>
 
         {/* ——— Loading ——— */}
-        {loading && <DivinationLoader />}
+        {loading && (
+          <div className="space-y-4">
+            <DivinationLoader />
+            {mode === 'ai' && (
+              <div className="text-center">
+                <button
+                  type="button"
+                  onClick={() => ai.cancel()}
+                  className="text-xs font-serif text-[var(--color-ink-400)] hover:text-[var(--color-vermillion)] transition-colors underline underline-offset-4"
+                >
+                  取消
+                </button>
+              </div>
+            )}
+          </div>
+        )}
 
         {/* ——— Error ——— */}
-        {error && (
-          <div className="mb-8 p-5 border-2 border-[var(--color-vermillion)] bg-[var(--color-vermillion-bg)] rounded text-[var(--color-vermillion-dark)] text-sm font-serif animate-fade-up">
-            {error}
+        {error && !loading && (
+          <div className="mb-8 animate-fade-up">
+            <InlineErrorState
+              message={error}
+              onRetry={situation.trim() ? handleSubmit : undefined}
+            />
+          </div>
+        )}
+
+        {/* ——— AI Empty Result ——— */}
+        {mode === 'ai' && ai.done && !ai.matchData && !ai.error && !ai.loading && (
+          <div className="mb-8 p-6 border border-[var(--color-ink-200)] rounded bg-[var(--color-paper-light)] text-center text-sm font-serif text-[var(--color-ink-600)] leading-relaxed animate-fade-up">
+            <p>未匹配到合适的卦象。这通常意味着情境描述不够具体——</p>
+            <p className="mt-2 text-xs text-[var(--color-ink-400)]">
+              补充关键细节（你的角色 / 当前阶段 / 最关心什么）后再问一次。
+            </p>
           </div>
         )}
 
@@ -316,6 +347,25 @@ export default function Home() {
                   </span>
                 )}
               </div>
+
+              {/* 记此一卦 */}
+              {situation.trim() && (
+                <SaveConsultationButton
+                  situation={situation.trim()}
+                  hexagramId={aiHexagram.number}
+                  hexagramName={aiHexagram.name.chinese}
+                  fitScore={confidenceToScore(ai.matchData.confidence)}
+                  aiYao={{
+                    position: ai.matchData.yaoPosition as 1 | 2 | 3 | 4 | 5 | 6,
+                    name:
+                      aiHexagram.yao[ai.matchData.yaoPosition - 1]?.name ??
+                      `第${ai.matchData.yaoPosition}爻`,
+                    brief: ai.matchData.yaoBrief,
+                    confidence: ai.matchData.confidence,
+                  }}
+                  consultMode="ai"
+                />
+              )}
             </div>
           </section>
         )}

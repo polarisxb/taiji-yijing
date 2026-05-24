@@ -3,7 +3,12 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { zhengStore } from '@/lib/zheng/store'
-import type { SaveRecordInput, SavedYaoLocation } from '@/lib/zheng/types'
+import type {
+  AiYaoPrediction,
+  ConsultMode,
+  SaveRecordInput,
+  SavedYaoLocation,
+} from '@/lib/zheng/types'
 
 type Props = {
   situation: string
@@ -11,6 +16,8 @@ type Props = {
   hexagramName: string
   fitScore: number
   yaoLocation?: SavedYaoLocation
+  aiYao?: AiYaoPrediction
+  consultMode?: ConsultMode
 }
 
 type Status = 'idle' | 'saving' | 'saved' | 'error'
@@ -31,6 +38,8 @@ export function SaveConsultationButton(props: Props) {
       hexagramName: props.hexagramName,
       fitScore: props.fitScore,
       yaoLocation: props.yaoLocation,
+      aiYao: props.aiYao,
+      consultMode: props.consultMode,
       userNote: note.trim() || undefined,
     }
     try {

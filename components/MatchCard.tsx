@@ -250,6 +250,7 @@ export function MatchCard({ match, rank, situation }: Props) {
               hexagramName={hexagram.name.chinese}
               fitScore={score.total}
               yaoLocation={toSavedYaoLocation(locatorResult)}
+              consultMode="classic"
             />
           )}
 

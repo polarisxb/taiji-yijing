@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { Atmosphere } from '@/components/Atmosphere'
 import { VerificationControl } from '@/components/zheng/VerificationControl'
 import { zhengStore } from '@/lib/zheng/store'
+import { confidenceLabel } from '@/lib/zheng/confidence'
 import type { ConsultationRecord } from '@/lib/zheng/types'
 
 type RecordState = ConsultationRecord | null | 'loading' | 'missing'
@@ -74,8 +75,19 @@ export default function HistoryDetailPage() {
         </Link>
 
         <header>
-          <div className="text-xs font-mono tracking-widest text-[var(--color-ink-400)]">
-            {new Date(record.createdAt).toLocaleString()}
+          <div className="text-xs font-mono tracking-widest text-[var(--color-ink-400)] flex items-center gap-3">
+            <span>{new Date(record.createdAt).toLocaleString()}</span>
+            {record.consultMode && (
+              <span
+                className={
+                  record.consultMode === 'ai'
+                    ? 'px-2 py-[1px] text-[10px] tracking-wide rounded border border-[var(--color-vermillion)] text-[var(--color-vermillion)]'
+                    : 'px-2 py-[1px] text-[10px] tracking-wide rounded border border-[var(--color-ink-300)] text-[var(--color-ink-500)]'
+                }
+              >
+                {record.consultMode === 'ai' ? 'AI 模式' : '经典模式'}
+              </span>
+            )}
           </div>
           <h1 className="mt-2 font-serif text-5xl font-bold text-[var(--color-ink-900)]">
             {record.hexagramName}
@@ -115,6 +127,25 @@ export default function HistoryDetailPage() {
                 <span className="ml-2 text-[var(--color-ink-400)]">
                   · 也明显落在 {record.yaoLocation.crossYaoName}
                 </span>
+              )}
+            </div>
+          )}
+
+          {record.aiYao && (
+            <div className="text-sm font-serif text-[var(--color-ink-600)] space-y-1">
+              <div>
+                AI 定位 ·{' '}
+                <span className="text-[var(--color-ink-900)] font-semibold">
+                  {record.aiYao.name}
+                </span>
+                <span className="ml-2 text-[10px] text-[var(--color-ink-400)] tracking-wide">
+                  置信 {confidenceLabel(record.aiYao.confidence)}
+                </span>
+              </div>
+              {record.aiYao.brief && (
+                <p className="text-xs text-[var(--color-ink-500)] leading-relaxed pl-4 border-l-2 border-[var(--color-ink-100)]">
+                  {record.aiYao.brief}
+                </p>
               )}
             </div>
           )}
