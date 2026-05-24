@@ -91,21 +91,23 @@ export function AiResultCard({ hexagram, matchData, interpretation, done, situat
         </Link>
       </div>
 
-      {/* 记此一卦 */}
-      {situation.trim() && (
-        <SaveConsultationButton
-          situation={situation.trim()}
-          hexagramId={hexagram.number}
-          hexagramName={hexagram.name.chinese}
-          fitScore={confidenceToScore(matchData.confidence)}
-          aiYao={{
-            position: matchData.yaoPosition as 1 | 2 | 3 | 4 | 5 | 6,
-            name: yaoName,
-            brief: matchData.yaoBrief,
-            confidence: matchData.confidence,
-          }}
-          consultMode="ai"
-        />
+      {/* 记此一卦 — 解读完成后渐显（PR-2/F：让用户先读完再动） */}
+      {situation.trim() && done && (
+        <div className="animate-fade-up" style={{ animationDelay: '0.3s' }}>
+          <SaveConsultationButton
+            situation={situation.trim()}
+            hexagramId={hexagram.number}
+            hexagramName={hexagram.name.chinese}
+            fitScore={confidenceToScore(matchData.confidence)}
+            aiYao={{
+              position: matchData.yaoPosition as 1 | 2 | 3 | 4 | 5 | 6,
+              name: yaoName,
+              brief: matchData.yaoBrief,
+              confidence: matchData.confidence,
+            }}
+            consultMode="ai"
+          />
+        </div>
       )}
     </div>
   )
