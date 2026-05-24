@@ -1,6 +1,7 @@
 import { Atmosphere } from '@/components/Atmosphere'
 import { ALL_HEXAGRAMS } from '@/content/hexagrams'
 import { HexagramGrid } from '@/components/hexagram/HexagramGrid'
+import { HistoryNavLink } from '@/components/zheng/HistoryNavLink'
 import Link from 'next/link'
 import type { Metadata } from 'next'
 
@@ -30,12 +31,15 @@ export default function HexagramsPage() {
         <HexagramGrid hexagrams={ALL_HEXAGRAMS} />
 
         <footer className="mt-16 text-center">
-          <Link
-            href="/"
-            className="text-xs font-serif text-[var(--color-ink-400)] hover:text-[var(--color-vermillion)] transition-colors"
-          >
-            ← 回到问卦
-          </Link>
+          <div className="flex items-center justify-center gap-4">
+            <Link
+              href="/"
+              className="text-xs font-serif text-[var(--color-ink-400)] hover:text-[var(--color-vermillion)] transition-colors"
+            >
+              ← 回到问卦
+            </Link>
+            <HistoryNavLink className="text-xs font-serif text-[var(--color-ink-400)] hover:text-[var(--color-vermillion)] transition-colors before:content-['·'] before:mr-4 before:text-[var(--color-ink-300)]" />
+          </div>
         </footer>
       </div>
     </>
