@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, afterEach } from 'vitest'
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import { localZhengStore } from '@/lib/zheng/store-local'
 import type { ConsultationRecord, SaveRecordInput } from '@/lib/zheng/types'
 
@@ -62,12 +62,22 @@ function baseInput(overrides: Partial<SaveRecordInput> = {}): SaveRecordInput {
 }
 
 async function seed(count: number): Promise<ConsultationRecord[]> {
+  // Mock Date.now so createdAt is strictly monotonically increasing.
+  // Real setTimeout(1) was flaky under load — Date.now() can repeat across calls
+  // when the timer resolves in <1ms, breaking the descending-order assertion.
   const records: ConsultationRecord[] = []
-  for (let i = 0; i < count; i++) {
-    // 1ms gap so createdAt is monotonically increasing
-    await new Promise((r) => setTimeout(r, 1))
-    const r = await localZhengStore.saveRecord(baseInput({ situation: `情境${i}` }))
-    records.push(r)
+  let t = 1_700_000_000_000
+  const spy = vi.spyOn(Date, 'now').mockImplementation(() => {
+    t += 10
+    return t
+  })
+  try {
+    for (let i = 0; i < count; i++) {
+      const r = await localZhengStore.saveRecord(baseInput({ situation: `情境${i}` }))
+      records.push(r)
+    }
+  } finally {
+    spy.mockRestore()
   }
   return records
 }
@@ -253,6 +263,145 @@ describe('localZhengStore', () => {
     it('saveRecord throws when window is undefined (caller must be in browser)', async () => {
       delete (globalThis as Sandbox).window
       await expect(localZhengStore.saveRecord(baseInput())).rejects.toThrow()
+    })
+  })
+
+  describe('clearAll', () => {
+    it('removes every record and returns the cleared count', async () => {
+      await seed(3)
+      const beforeAll = await localZhengStore.listRecords()
+      expect(beforeAll).toHaveLength(3)
+
+      const cleared = await localZhengStore.clearAll()
+      expect(cleared).toBe(3)
+
+      const afterAll = await localZhengStore.listRecords()
+      expect(afterAll).toEqual([])
+    })
+
+    it('returns 0 when storage is already empty', async () => {
+      const cleared = await localZhengStore.clearAll()
+      expect(cleared).toBe(0)
+    })
+
+    it('returns 0 when window is undefined (SSR safe)', async () => {
+      delete (globalThis as Sandbox).window
+      const cleared = await localZhengStore.clearAll()
+      expect(cleared).toBe(0)
+    })
+  })
+
+  describe('importRecords', () => {
+    function makeRecord(id: string, createdAt: number, situation = '情境'): ConsultationRecord {
+      return {
+        id,
+        schemaVersion: 1,
+        createdAt,
+        situation,
+        hexagramId: 3,
+        hexagramName: '屯',
+        fitScore: 0.72,
+        verification: 'unverified',
+      }
+    }
+
+    describe('mode: merge', () => {
+      it('appends new records to existing ones', async () => {
+        const existing = await seed(2)
+        const incoming = [
+          makeRecord('new-1', 2_000_000_000_000),
+          makeRecord('new-2', 2_000_000_000_100),
+        ]
+        const result = await localZhengStore.importRecords(incoming, 'merge')
+
+        expect(result.imported).toBe(2)
+        expect(result.skipped).toBe(0)
+        expect(result.total).toBe(4)
+
+        const all = await localZhengStore.listRecords()
+        const ids = all.map((r) => r.id).sort()
+        expect(ids).toEqual([existing[0].id, existing[1].id, 'new-1', 'new-2'].sort())
+      })
+
+      it('on UUID collision keeps the createdAt-newer one', async () => {
+        const existing = await seed(1)
+        const colliding = makeRecord(existing[0].id, existing[0].createdAt + 100_000, '更新的情境')
+
+        const result = await localZhengStore.importRecords([colliding], 'merge')
+        expect(result.imported).toBe(0)
+        expect(result.skipped).toBe(1)
+        expect(result.total).toBe(1)
+
+        const all = await localZhengStore.listRecords()
+        expect(all).toHaveLength(1)
+        expect(all[0].situation).toBe('更新的情境')
+      })
+
+      it('on UUID collision keeps the existing one when it is newer', async () => {
+        const existing = await seed(1)
+        const older = makeRecord(existing[0].id, existing[0].createdAt - 100_000, '更早的情境')
+
+        const result = await localZhengStore.importRecords([older], 'merge')
+        expect(result.skipped).toBe(1)
+
+        const all = await localZhengStore.listRecords()
+        expect(all).toHaveLength(1)
+        expect(all[0].id).toBe(existing[0].id)
+        expect(all[0].situation).not.toBe('更早的情境')
+      })
+
+      it('merging into empty storage imports everything', async () => {
+        const incoming = [makeRecord('a', 1), makeRecord('b', 2)]
+        const result = await localZhengStore.importRecords(incoming, 'merge')
+        expect(result.imported).toBe(2)
+        expect(result.skipped).toBe(0)
+        expect(result.total).toBe(2)
+      })
+
+      it('merging an empty array is a no-op', async () => {
+        await seed(2)
+        const result = await localZhengStore.importRecords([], 'merge')
+        expect(result.imported).toBe(0)
+        expect(result.skipped).toBe(0)
+        expect(result.total).toBe(2)
+      })
+    })
+
+    describe('mode: overwrite', () => {
+      it('replaces every existing record', async () => {
+        await seed(3)
+        const incoming = [makeRecord('only-1', 1)]
+        const result = await localZhengStore.importRecords(incoming, 'overwrite')
+
+        expect(result.imported).toBe(1)
+        expect(result.skipped).toBe(0)
+        expect(result.total).toBe(1)
+
+        const all = await localZhengStore.listRecords()
+        expect(all).toHaveLength(1)
+        expect(all[0].id).toBe('only-1')
+      })
+
+      it('overwriting with an empty array clears storage', async () => {
+        await seed(2)
+        const result = await localZhengStore.importRecords([], 'overwrite')
+        expect(result.total).toBe(0)
+        const all = await localZhengStore.listRecords()
+        expect(all).toEqual([])
+      })
+
+      it('overwriting empty storage just sets the records', async () => {
+        const incoming = [makeRecord('x', 1), makeRecord('y', 2)]
+        const result = await localZhengStore.importRecords(incoming, 'overwrite')
+        expect(result.imported).toBe(2)
+        expect(result.total).toBe(2)
+      })
+    })
+
+    it('returns zero counts when window is undefined (SSR safe)', async () => {
+      delete (globalThis as Sandbox).window
+      const result = await localZhengStore.importRecords([makeRecord('x', 1)], 'merge')
+      expect(result).toEqual({ imported: 0, skipped: 0, total: 0 })
     })
   })
 })

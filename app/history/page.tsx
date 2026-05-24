@@ -35,13 +35,21 @@ export default function HistoryListPage() {
     <>
       <Atmosphere />
       <div className="relative z-10 max-w-3xl mx-auto px-6 py-16 md:py-24">
-        <header className="mb-12 text-center">
+        <header className="mb-12 text-center relative">
           <h1 className="font-serif text-5xl font-bold text-[var(--color-ink-900)] tracking-widest">
             履
           </h1>
           <p className="mt-4 text-xs tracking-[0.4em] text-[var(--color-ink-400)] font-serif">
             走过的路 · 暂存本地 — 后续会同步到账号
           </p>
+          <Link
+            href="/settings"
+            aria-label="管理本地数据"
+            title="管理本地数据"
+            className="absolute right-0 top-0 text-xs font-serif text-[var(--color-ink-400)] hover:text-[var(--color-vermillion)] transition-colors"
+          >
+            管理 ⚙
+          </Link>
         </header>
 
         {records === null ? (

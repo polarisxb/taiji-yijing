@@ -7,6 +7,17 @@
 
 import type { ConsultationRecord, SaveRecordInput, VerificationStatus } from './types'
 
+export type ImportMode = 'merge' | 'overwrite'
+
+export type ImportResult = {
+  /** 实际新写入的记录数（合并时被现有覆盖的不计） */
+  imported: number
+  /** 被跳过的记录数（合并模式下因为 UUID 碰撞且 incoming 更早被忽略） */
+  skipped: number
+  /** 操作完成后 storage 中的总记录数 */
+  total: number
+}
+
 export interface ZhengStore {
   /** 返回所有记录，按 createdAt 倒序（新的在前） */
   listRecords(): Promise<ConsultationRecord[]>
@@ -31,4 +42,15 @@ export interface ZhengStore {
 
   /** 删除一条记录；成功返回 true，不存在返回 false */
   deleteRecord(id: string): Promise<boolean>
+
+  /** 清空所有记录，返回清空前的数量；SSR 环境返回 0 */
+  clearAll(): Promise<number>
+
+  /**
+   * 导入一批记录。
+   * - 'merge'：追加；UUID 碰撞时按 createdAt 取较新者，被忽略的计入 skipped
+   * - 'overwrite'：直接替换所有现有记录
+   * SSR 环境返回 { imported: 0, skipped: 0, total: 0 }
+   */
+  importRecords(records: ConsultationRecord[], mode: ImportMode): Promise<ImportResult>
 }
