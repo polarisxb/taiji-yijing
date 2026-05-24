@@ -4,14 +4,16 @@ import type { ConsultationRecord, SaveRecordInput } from '@/lib/zheng/types'
 
 // ---------- fake localStorage ----------
 
-type Storage = {
+type FakeStorage = {
   getItem(key: string): string | null
   setItem(key: string, value: string): void
   removeItem(key: string): void
   clear(): void
+  readonly length: number
+  key(index: number): string | null
 }
 
-function createFakeLocalStorage(): Storage {
+function createFakeLocalStorage(): FakeStorage {
   const map = new Map<string, string>()
   return {
     getItem: (k) => (map.has(k) ? (map.get(k) as string) : null),
@@ -22,22 +24,29 @@ function createFakeLocalStorage(): Storage {
       map.delete(k)
     },
     clear: () => map.clear(),
+    get length() {
+      return map.size
+    },
+    key: (i) => Array.from(map.keys())[i] ?? null,
   }
 }
 
 const STORAGE_KEY = 'taiji-yijing.zheng.v1'
 
-declare global {
-   
-  var window: { localStorage: Storage } | undefined
+type Sandbox = { window?: { localStorage: FakeStorage } }
+
+function getStorage(): FakeStorage {
+  const sb = globalThis as unknown as Sandbox
+  if (!sb.window) throw new Error('test setup: window not initialised')
+  return sb.window.localStorage
 }
 
 beforeEach(() => {
-  globalThis.window = { localStorage: createFakeLocalStorage() }
+  ;(globalThis as Sandbox).window = { localStorage: createFakeLocalStorage() }
 })
 
 afterEach(() => {
-  delete (globalThis as { window?: unknown }).window
+  delete (globalThis as Sandbox).window
 })
 
 // ---------- helpers ----------
@@ -135,9 +144,9 @@ describe('localZhengStore', () => {
 
     it('silently drops invalid entries via zod schema check', async () => {
       const good = await localZhengStore.saveRecord(baseInput())
-      const raw = JSON.parse(globalThis.window!.localStorage.getItem(STORAGE_KEY) as string)
+      const raw = JSON.parse(getStorage().getItem(STORAGE_KEY) as string)
       raw.push({ id: 'broken', schemaVersion: 1, garbage: true }) // schema-invalid
-      globalThis.window!.localStorage.setItem(STORAGE_KEY, JSON.stringify(raw))
+      getStorage().setItem(STORAGE_KEY, JSON.stringify(raw))
 
       const all = await localZhengStore.listRecords()
       expect(all).toHaveLength(1)
@@ -145,13 +154,13 @@ describe('localZhengStore', () => {
     })
 
     it('returns [] when raw value is not JSON', async () => {
-      globalThis.window!.localStorage.setItem(STORAGE_KEY, '{not json')
+      getStorage().setItem(STORAGE_KEY, '{not json')
       const all = await localZhengStore.listRecords()
       expect(all).toEqual([])
     })
 
     it('returns [] when raw value is JSON but not an array', async () => {
-      globalThis.window!.localStorage.setItem(STORAGE_KEY, '{"foo": "bar"}')
+      getStorage().setItem(STORAGE_KEY, '{"foo": "bar"}')
       const all = await localZhengStore.listRecords()
       expect(all).toEqual([])
     })
@@ -230,19 +239,19 @@ describe('localZhengStore', () => {
 
   describe('SSR safety', () => {
     it('listRecords returns [] when window is undefined', async () => {
-      delete (globalThis as { window?: unknown }).window
+      delete (globalThis as Sandbox).window
       const all = await localZhengStore.listRecords()
       expect(all).toEqual([])
     })
 
     it('getRecord returns null when window is undefined', async () => {
-      delete (globalThis as { window?: unknown }).window
+      delete (globalThis as Sandbox).window
       const found = await localZhengStore.getRecord('any')
       expect(found).toBeNull()
     })
 
     it('saveRecord throws when window is undefined (caller must be in browser)', async () => {
-      delete (globalThis as { window?: unknown }).window
+      delete (globalThis as Sandbox).window
       await expect(localZhengStore.saveRecord(baseInput())).rejects.toThrow()
     })
   })
