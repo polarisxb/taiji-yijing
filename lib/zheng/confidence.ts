@@ -34,3 +34,33 @@ export function confidenceLabel(confidence: AiConfidence): string {
       return '审慎'
   }
 }
+
+/**
+ * AI confidence 徽章的视觉表达（label + tailwind 颜色类）。
+ *
+ * 单一来源——所有展示 AI confidence 徽章的组件
+ * （ReasoningPanel, AiResultCard, history detail, RecordCard）都应取这里，
+ * 不要各自重新定义文案/颜色，否则改一处忘三处。
+ *
+ * 颜色策略：
+ * - 定见 = 暖纸/暖棕/暖金（义理派暖灰系统）
+ * - 待审 = amber（标准 tailwind 警示偏温）
+ * - 审慎 = rose（标准 tailwind 谨慎偏冷）
+ */
+export type ConfidenceBadge = {
+  label: string
+  colorClass: string
+}
+
+const CONFIDENCE_COLOR_CLASS: Record<AiConfidence, string> = {
+  high: 'text-[#7a6e5d] bg-[#f5f0e8] border-[#c4b99a]',
+  medium: 'text-amber-700 bg-amber-50 border-amber-300',
+  low: 'text-rose-700 bg-rose-50 border-rose-300',
+}
+
+export function getConfidenceBadge(confidence: AiConfidence): ConfidenceBadge {
+  return {
+    label: confidenceLabel(confidence),
+    colorClass: CONFIDENCE_COLOR_CLASS[confidence],
+  }
+}

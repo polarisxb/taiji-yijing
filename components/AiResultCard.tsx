@@ -7,7 +7,7 @@ import { HexagramSymbol } from './HexagramSymbol'
 import { ReasoningPanel } from './ReasoningPanel'
 import { StreamingText } from './StreamingText'
 import { SaveConsultationButton } from './zheng/SaveConsultationButton'
-import { confidenceToScore } from '@/lib/zheng/confidence'
+import { confidenceToScore, getConfidenceBadge } from '@/lib/zheng/confidence'
 
 type Props = {
   hexagram: Hexagram
@@ -17,24 +17,9 @@ type Props = {
   situation: string
 }
 
-const CONFIDENCE_BADGE: Record<MatchData['confidence'], { text: string; cls: string }> = {
-  high: {
-    text: '定见',
-    cls: 'text-[#7a6e5d] bg-[#f5f0e8] border-[#c4b99a]',
-  },
-  medium: {
-    text: '待审',
-    cls: 'text-amber-700 bg-amber-50 border-amber-300',
-  },
-  low: {
-    text: '审慎',
-    cls: 'text-rose-700 bg-rose-50 border-rose-300',
-  },
-}
-
 export function AiResultCard({ hexagram, matchData, interpretation, done, situation }: Props) {
   const yaoName = hexagram.yao[matchData.yaoPosition - 1]?.name ?? `第${matchData.yaoPosition}爻`
-  const badge = CONFIDENCE_BADGE[matchData.confidence]
+  const badge = getConfidenceBadge(matchData.confidence)
 
   return (
     <div
@@ -62,10 +47,10 @@ export function AiResultCard({ hexagram, matchData, interpretation, done, situat
         </div>
         <div className="shrink-0">
           <span
-            className={`inline-flex items-center gap-1 px-2.5 py-1 text-[11px] font-serif tracking-wide border rounded-sm ${badge.cls}`}
-            aria-label={`AI 确信度 ${badge.text}`}
+            className={`inline-flex items-center gap-1 px-2.5 py-1 text-[11px] font-serif tracking-wide border rounded-sm ${badge.colorClass}`}
+            aria-label={`AI 确信度 ${badge.label}`}
           >
-            {badge.text}
+            {badge.label}
           </span>
           <div className="mt-1 text-[10px] tracking-[0.2em] text-[var(--color-ink-400)] font-serif text-right">
             确信

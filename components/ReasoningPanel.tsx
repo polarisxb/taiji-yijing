@@ -2,21 +2,17 @@
 
 import { useState } from 'react'
 import { SmoothExpand } from './SmoothExpand'
+import { getConfidenceBadge } from '@/lib/zheng/confidence'
+import type { AiConfidence } from '@/lib/zheng/types'
 
 type Props = {
   reasoning: string
-  confidence: 'high' | 'medium' | 'low'
-}
-
-const CONFIDENCE_LABELS: Record<string, { text: string; color: string }> = {
-  high: { text: '定见', color: 'text-[#7a6e5d] bg-[#f5f0e8] border-[#c4b99a]' },
-  medium: { text: '待审', color: 'text-amber-700 bg-amber-50 border-amber-300' },
-  low: { text: '审慎', color: 'text-rose-700 bg-rose-50 border-rose-300' },
+  confidence: AiConfidence
 }
 
 export function ReasoningPanel({ reasoning, confidence }: Props) {
   const [open, setOpen] = useState(false)
-  const label = CONFIDENCE_LABELS[confidence] ?? CONFIDENCE_LABELS.medium
+  const badge = getConfidenceBadge(confidence)
 
   return (
     <div className="mt-3">
@@ -34,8 +30,8 @@ export function ReasoningPanel({ reasoning, confidence }: Props) {
           ▸
         </span>
         <span>为什么是这一卦？</span>
-        <span className={`px-1.5 py-0.5 text-[10px] border rounded ${label.color}`}>
-          {label.text}
+        <span className={`px-1.5 py-0.5 text-[10px] border rounded ${badge.colorClass}`}>
+          {badge.label}
         </span>
       </button>
       <SmoothExpand open={open} duration={300}>
