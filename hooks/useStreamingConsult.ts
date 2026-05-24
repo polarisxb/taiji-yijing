@@ -77,6 +77,9 @@ export function useStreamingConsult() {
           }
         }
       }
+
+      // Stream closed; reset loading + ensure done so empty-result path is reachable
+      setState((s) => ({ ...s, loading: false, done: true }))
     } catch (e) {
       if ((e as Error).name === 'AbortError') return
       setState((s) => ({

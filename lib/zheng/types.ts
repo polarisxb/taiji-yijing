@@ -18,6 +18,17 @@ export type SavedYaoLocation = {
   crossYaoName?: string
 }
 
+export type AiConfidence = 'high' | 'medium' | 'low'
+
+export type AiYaoPrediction = {
+  position: 1 | 2 | 3 | 4 | 5 | 6
+  name: string
+  brief: string
+  confidence: AiConfidence
+}
+
+export type ConsultMode = 'classic' | 'ai'
+
 export type ConsultationRecord = {
   /** 全局唯一 ID（UUID v4），迁移到后端无需重映射 */
   id: string
@@ -35,6 +46,10 @@ export type ConsultationRecord = {
   fitScore: number
   /** YaoLocator 定位结果（用户没用 locator 时 undefined） */
   yaoLocation?: SavedYaoLocation
+  /** AI 模式独有：模型对爻位的判断（与 yaoLocation 互斥；不污染经典 matcher 数据） */
+  aiYao?: AiYaoPrediction
+  /** 此条记录来自哪种问询模式；老记录可能为 undefined */
+  consultMode?: ConsultMode
   /** 保存时可选的"我打算怎么做" */
   userNote?: string
   /** 初始 "unverified"，回访时改成 fulfilled/partial/unfulfilled */

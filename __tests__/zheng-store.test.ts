@@ -132,6 +132,37 @@ describe('localZhengStore', () => {
       expect(saved.userNote).toBe('本周内与三位顾问通电话')
     })
 
+    it('preserves optional aiYao + consultMode when provided', async () => {
+      const saved = await localZhengStore.saveRecord(
+        baseInput({
+          aiYao: {
+            position: 5,
+            name: '九五',
+            brief: '飞龙在天，处于巅峰',
+            confidence: 'high',
+          },
+          consultMode: 'ai',
+        }),
+      )
+      expect(saved.aiYao).toEqual({
+        position: 5,
+        name: '九五',
+        brief: '飞龙在天，处于巅峰',
+        confidence: 'high',
+      })
+      expect(saved.consultMode).toBe('ai')
+
+      const fetched = await localZhengStore.getRecord(saved.id)
+      expect(fetched?.aiYao).toEqual(saved.aiYao)
+      expect(fetched?.consultMode).toBe('ai')
+    })
+
+    it('keeps aiYao + consultMode undefined when not provided (classic / legacy records)', async () => {
+      const saved = await localZhengStore.saveRecord(baseInput())
+      expect(saved.aiYao).toBeUndefined()
+      expect(saved.consultMode).toBeUndefined()
+    })
+
     it('round-trips through listRecords', async () => {
       const saved = await localZhengStore.saveRecord(baseInput())
       const all = await localZhengStore.listRecords()

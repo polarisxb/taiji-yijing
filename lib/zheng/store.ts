@@ -15,7 +15,10 @@ export const zhengStore: ZhengStore = localZhengStore
 
 export type { ZhengStore } from './store-types'
 export type {
+  AiConfidence,
+  AiYaoPrediction,
   ConsultationRecord,
+  ConsultMode,
   SavedYaoLocation,
   SaveRecordInput,
   VerificationStatus,

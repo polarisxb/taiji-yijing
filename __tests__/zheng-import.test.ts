@@ -99,4 +99,69 @@ describe('parseImport', () => {
       expect(result.data).toEqual(validWrapper)
     }
   })
+
+  it('accepts records with optional aiYao + consultMode fields', () => {
+    const result = parseImport(
+      JSON.stringify({
+        ...validWrapper,
+        recordCount: 1,
+        records: [
+          {
+            ...validWrapper.records[0],
+            consultMode: 'ai',
+            aiYao: {
+              position: 5,
+              name: '九五',
+              brief: '飞龙在天',
+              confidence: 'high',
+            },
+          },
+        ],
+      }),
+    )
+    expect(result.ok).toBe(true)
+    if (result.ok) {
+      const r = result.data.records[0]
+      expect(r.consultMode).toBe('ai')
+      expect(r.aiYao?.position).toBe(5)
+      expect(r.aiYao?.confidence).toBe('high')
+    }
+  })
+
+  it('rejects records with invalid aiYao.confidence value', () => {
+    const result = parseImport(
+      JSON.stringify({
+        ...validWrapper,
+        recordCount: 1,
+        records: [
+          {
+            ...validWrapper.records[0],
+            aiYao: {
+              position: 5,
+              name: '九五',
+              brief: '',
+              confidence: 'unknown',
+            },
+          },
+        ],
+      }),
+    )
+    expect(result.ok).toBe(false)
+  })
+
+  it('rejects records with invalid consultMode value', () => {
+    const result = parseImport(
+      JSON.stringify({
+        ...validWrapper,
+        recordCount: 1,
+        records: [
+          {
+            ...validWrapper.records[0],
+            consultMode: 'magic',
+          },
+        ],
+      }),
+    )
+    expect(result.ok).toBe(false)
+  })
 })

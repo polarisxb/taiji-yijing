@@ -32,6 +32,17 @@ export const SavedYaoLocationSchema = z.object({
   crossYaoName: z.string().optional(),
 })
 
+export const AiConfidenceSchema = z.enum(['high', 'medium', 'low'])
+
+export const AiYaoPredictionSchema = z.object({
+  position: YaoPositionSchema,
+  name: z.string().min(1),
+  brief: z.string(),
+  confidence: AiConfidenceSchema,
+})
+
+export const ConsultModeSchema = z.enum(['classic', 'ai'])
+
 export const ConsultationRecordSchema = z.object({
   id: z.string().min(1),
   schemaVersion: z.literal(1),
@@ -41,6 +52,8 @@ export const ConsultationRecordSchema = z.object({
   hexagramName: z.string().min(1),
   fitScore: z.number().min(0).max(1),
   yaoLocation: SavedYaoLocationSchema.optional(),
+  aiYao: AiYaoPredictionSchema.optional(),
+  consultMode: ConsultModeSchema.optional(),
   userNote: z.string().optional(),
   verification: VerificationStatusSchema,
   verificationNote: z.string().optional(),
