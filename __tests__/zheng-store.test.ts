@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, afterEach } from 'vitest'
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import { localZhengStore } from '@/lib/zheng/store-local'
 import type { ConsultationRecord, SaveRecordInput } from '@/lib/zheng/types'
 
@@ -62,12 +62,22 @@ function baseInput(overrides: Partial<SaveRecordInput> = {}): SaveRecordInput {
 }
 
 async function seed(count: number): Promise<ConsultationRecord[]> {
+  // Mock Date.now so createdAt is strictly monotonically increasing.
+  // Real setTimeout(1) was flaky under load — Date.now() can repeat across calls
+  // when the timer resolves in <1ms, breaking the descending-order assertion.
   const records: ConsultationRecord[] = []
-  for (let i = 0; i < count; i++) {
-    // 1ms gap so createdAt is monotonically increasing
-    await new Promise((r) => setTimeout(r, 1))
-    const r = await localZhengStore.saveRecord(baseInput({ situation: `情境${i}` }))
-    records.push(r)
+  let t = 1_700_000_000_000
+  const spy = vi.spyOn(Date, 'now').mockImplementation(() => {
+    t += 10
+    return t
+  })
+  try {
+    for (let i = 0; i < count; i++) {
+      const r = await localZhengStore.saveRecord(baseInput({ situation: `情境${i}` }))
+      records.push(r)
+    }
+  } finally {
+    spy.mockRestore()
   }
   return records
 }
