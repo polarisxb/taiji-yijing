@@ -3,20 +3,45 @@
 import { useState } from 'react'
 import { ChevronDown } from 'lucide-react'
 import type { MatchResult, Yao } from '@/lib/types'
+import type { LocatorResult } from '@/lib/yao-locator'
+import type { SavedYaoLocation } from '@/lib/zheng/types'
 import { HexagramSymbol } from './HexagramSymbol'
 import { SmoothExpand } from './SmoothExpand'
 import { YaoLocator } from './yao-locator/YaoLocator'
+import { SaveConsultationButton } from './zheng/SaveConsultationButton'
 import { useCountUp, useScrollReveal } from '@/hooks/useAnimations'
 import Link from 'next/link'
 
 type Props = {
   match: MatchResult
   rank: number
+  /** Only required for rank 1 to enable saving to 「履」. */
+  situation?: string
 }
 
-export function MatchCard({ match, rank }: Props) {
+function toSavedYaoLocation(result: LocatorResult | null): SavedYaoLocation | undefined {
+  if (!result || result.topRatio === 0) return undefined
+  const topScore = result.scores.find((s) => s.position === result.topPosition)
+  if (!topScore) return undefined
+  const base: SavedYaoLocation = {
+    topPosition: result.topPosition,
+    topYaoName: topScore.yaoName,
+    topRatio: result.topRatio,
+  }
+  const cross = result.crossYao
+  if (cross === false) return base
+  const crossScore = result.scores.find((s) => s.position === cross.secondPosition)
+  return {
+    ...base,
+    crossYaoPosition: cross.secondPosition,
+    crossYaoName: crossScore?.yaoName,
+  }
+}
+
+export function MatchCard({ match, rank, situation }: Props) {
   const [expanded, setExpanded] = useState(rank === 1)
   const [openYao, setOpenYao] = useState<number | null>(null)
+  const [locatorResult, setLocatorResult] = useState<LocatorResult | null>(null)
   const { hexagram, score, reasoning } = match
 
   const pct = Math.round(score.total * 100)
@@ -121,7 +146,13 @@ export function MatchCard({ match, rank }: Props) {
 
           <Section label="六爻 · 事之六阶" icon="爻">
             <div className="space-y-4">
-              {rank === 1 && <YaoLocator yao={hexagram.yao} hexagramName={hexagram.name.chinese} />}
+              {rank === 1 && (
+                <YaoLocator
+                  yao={hexagram.yao}
+                  hexagramName={hexagram.name.chinese}
+                  onResultChange={setLocatorResult}
+                />
+              )}
               <div className="space-y-2">
                 {hexagram.yao.map((y) => (
                   <YaoRow
@@ -211,6 +242,16 @@ export function MatchCard({ match, rank }: Props) {
               <span>→</span>
             </Link>
           </div>
+
+          {rank === 1 && situation && (
+            <SaveConsultationButton
+              situation={situation}
+              hexagramId={hexagram.number}
+              hexagramName={hexagram.name.chinese}
+              fitScore={score.total}
+              yaoLocation={toSavedYaoLocation(locatorResult)}
+            />
+          )}
 
           <div className="px-6 py-3 text-[10px] text-[var(--color-ink-400)] flex gap-6 font-mono border-t border-[var(--color-ink-100)]">
             <ScoreChip label="词" value={score.keyword} active={visible} />

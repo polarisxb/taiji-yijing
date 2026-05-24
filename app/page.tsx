@@ -373,7 +373,11 @@ export default function Home() {
             <div className="space-y-6">
               {classicResult.matches.map((m, i) => (
                 <div key={m.hexagram.number} className={`animate-stagger-${i + 1}`}>
-                  <MatchCard match={m} rank={i + 1} />
+                  <MatchCard
+                    match={m}
+                    rank={i + 1}
+                    situation={i === 0 ? situation.trim() : undefined}
+                  />
                 </div>
               ))}
             </div>
