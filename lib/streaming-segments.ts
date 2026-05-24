@@ -1,40 +1,59 @@
 /**
- * Split a (possibly-streaming) interpretation text into segments for staggered fade-in.
+ * Split a (possibly-streaming) interpretation text into paragraphs of sentences,
+ * for paragraph-aware staggered fade-in rendering.
+ *
+ * Why two levels:
+ * - Paragraphs (split on \n) preserve the multi-section structure that the AI
+ *   prompt asks for ("先引经文，再释义，再映射用户情境，最后给建议"). The renderer puts
+ *   each paragraph in its own block, restoring vertical breaks.
+ * - Sentences within a paragraph (split on 。！？) enable per-sentence fade-in
+ *   animation without re-triggering animation on already-rendered prefix.
  *
  * Rules:
- * - Segments break at Chinese sentence terminators 。！？ (terminator attached to the
- *   preceding segment) and at explicit newlines (\n).
- * - Each segment is trimmed of surrounding whitespace.
- * - Empty segments produced by consecutive boundaries are dropped.
- * - A trailing fragment without a terminator (the in-progress sentence during streaming)
- *   is returned as the final segment.
- * - Streaming-stable: appending more characters to the input only changes the trailing
- *   segment (or adds new ones). Already-finalized segments are never reshuffled, so
- *   React keys remain stable and fade-in animations don't re-trigger on old text.
+ * - Outer array = paragraphs, inner arrays = sentences in source order.
+ * - Sentence terminators 。！？ are attached to the preceding sentence.
+ * - Each sentence is trimmed of surrounding whitespace.
+ * - Empty sentences (produced by consecutive terminators) are dropped.
+ * - Empty paragraphs (produced by blank lines) are dropped.
+ * - A trailing fragment without a terminator (the in-progress sentence during
+ *   streaming) is returned as the final sentence of the last paragraph.
+ * - Streaming-stable: appending more characters to the input only changes the
+ *   trailing sentence (or adds new ones / new paragraphs). Already-finalized
+ *   sentences are never reshuffled, so React keys remain stable and fade-in
+ *   animations don't re-trigger on old text.
  */
-export function splitInterpretationSegments(text: string): string[] {
+export function splitInterpretationParagraphs(text: string): string[][] {
   if (!text) return []
 
-  const segments: string[] = []
+  const paragraphs: string[][] = []
+  let currentPara: string[] = []
   let buffer = ''
+
+  const flushSentence = () => {
+    const trimmed = buffer.trim()
+    // 跳过纯标点的退化句（如连续终止符 "。。" 产生的第二个 "。"）
+    if (trimmed && /[^。！？\s]/.test(trimmed)) currentPara.push(trimmed)
+    buffer = ''
+  }
+
+  const flushParagraph = () => {
+    flushSentence()
+    if (currentPara.length > 0) paragraphs.push(currentPara)
+    currentPara = []
+  }
 
   for (const ch of text) {
     if (ch === '\n') {
-      const trimmed = buffer.trim()
-      if (trimmed) segments.push(trimmed)
-      buffer = ''
+      flushParagraph()
       continue
     }
     buffer += ch
     if (ch === '。' || ch === '！' || ch === '？') {
-      const trimmed = buffer.trim()
-      if (trimmed) segments.push(trimmed)
-      buffer = ''
+      flushSentence()
     }
   }
 
-  const tail = buffer.trim()
-  if (tail) segments.push(tail)
+  flushParagraph()
 
-  return segments
+  return paragraphs
 }
