@@ -9,9 +9,9 @@ type Props = {
 }
 
 const CONFIDENCE_LABELS: Record<string, { text: string; color: string }> = {
-  high: { text: '高置信', color: 'text-emerald-700 bg-emerald-50 border-emerald-300' },
-  medium: { text: '中置信', color: 'text-amber-700 bg-amber-50 border-amber-300' },
-  low: { text: '低置信', color: 'text-red-700 bg-red-50 border-red-300' },
+  high: { text: '定见', color: 'text-[#7a6e5d] bg-[#f5f0e8] border-[#c4b99a]' },
+  medium: { text: '待审', color: 'text-amber-700 bg-amber-50 border-amber-300' },
+  low: { text: '审慎', color: 'text-rose-700 bg-rose-50 border-rose-300' },
 }
 
 export function ReasoningPanel({ reasoning, confidence }: Props) {

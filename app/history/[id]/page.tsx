@@ -107,7 +107,17 @@ export default function HistoryDetailPage() {
           <div className="text-sm font-serif text-[var(--color-ink-600)]">
             当时匹配 ·{' '}
             <span className="text-[var(--color-ink-900)] font-semibold">{record.hexagramName}</span>
-            （契合度 {Math.round(record.fitScore * 100)}%）
+            {record.consultMode === 'ai' && record.aiYao ? (
+              <span className="ml-1">
+                （AI 确信
+                <span className="text-[var(--color-ink-800)] font-semibold ml-1">
+                  {confidenceLabel(record.aiYao.confidence)}
+                </span>
+                ）
+              </span>
+            ) : (
+              <span>（契合度 {Math.round(record.fitScore * 100)}%）</span>
+            )}
             <Link
               href={`/hexagram/${record.hexagramId}`}
               className="ml-3 text-xs text-[var(--color-vermillion)] hover:underline"
@@ -139,7 +149,7 @@ export default function HistoryDetailPage() {
                   {record.aiYao.name}
                 </span>
                 <span className="ml-2 text-[10px] text-[var(--color-ink-400)] tracking-wide">
-                  置信 {confidenceLabel(record.aiYao.confidence)}
+                  确信 {confidenceLabel(record.aiYao.confidence)}
                 </span>
               </div>
               {record.aiYao.brief && (

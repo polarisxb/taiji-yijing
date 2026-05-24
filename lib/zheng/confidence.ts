@@ -18,13 +18,19 @@ export function confidenceToScore(confidence: AiConfidence): number {
   }
 }
 
+/**
+ * 义理派表达：AI 的把握以文字而非数字表达。
+ * - 定见：AI 有把握
+ * - 待审：AI 觉得方向对但需用户自审
+ * - 审慎：AI 拿不准，请用户审慎参考
+ */
 export function confidenceLabel(confidence: AiConfidence): string {
   switch (confidence) {
     case 'high':
-      return '高'
+      return '定见'
     case 'medium':
-      return '中'
+      return '待审'
     case 'low':
-      return '低'
+      return '审慎'
   }
 }

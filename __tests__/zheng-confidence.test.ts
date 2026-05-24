@@ -24,9 +24,9 @@ describe('confidenceToScore', () => {
 })
 
 describe('confidenceLabel', () => {
-  it('returns 中文 labels', () => {
-    expect(confidenceLabel('high')).toBe('高')
-    expect(confidenceLabel('medium')).toBe('中')
-    expect(confidenceLabel('low')).toBe('低')
+  it('returns 义理派 labels (定见 / 待审 / 审慎)', () => {
+    expect(confidenceLabel('high')).toBe('定见')
+    expect(confidenceLabel('medium')).toBe('待审')
+    expect(confidenceLabel('low')).toBe('审慎')
   })
 })
