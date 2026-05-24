@@ -7,7 +7,7 @@
  */
 
 import { ConsultationRecordSchema } from './schema'
-import type { ZhengStore } from './store-types'
+import type { ImportMode, ImportResult, ZhengStore } from './store-types'
 import type { ConsultationRecord, SaveRecordInput, VerificationStatus } from './types'
 
 const STORAGE_KEY = 'taiji-yijing.zheng.v1'
@@ -92,5 +92,45 @@ export const localZhengStore: ZhengStore = {
     if (next.length === all.length) return false
     writeAll(next)
     return true
+  },
+
+  async clearAll() {
+    if (!isBrowser()) return 0
+    const before = readAll().length
+    window.localStorage.removeItem(STORAGE_KEY)
+    return before
+  },
+
+  async importRecords(records: ConsultationRecord[], mode: ImportMode): Promise<ImportResult> {
+    if (!isBrowser()) return { imported: 0, skipped: 0, total: 0 }
+
+    if (mode === 'overwrite') {
+      writeAll(records)
+      return { imported: records.length, skipped: 0, total: records.length }
+    }
+
+    // merge: 按 UUID 合并，碰撞时取 createdAt 较新者
+    const existing = readAll()
+    const byId = new Map<string, ConsultationRecord>()
+    for (const r of existing) byId.set(r.id, r)
+
+    let imported = 0
+    let skipped = 0
+    for (const incoming of records) {
+      const current = byId.get(incoming.id)
+      if (!current) {
+        byId.set(incoming.id, incoming)
+        imported += 1
+      } else if (incoming.createdAt > current.createdAt) {
+        byId.set(incoming.id, incoming)
+        skipped += 1 // existing was replaced; incoming counted as "skipped-collision"
+      } else {
+        skipped += 1
+      }
+    }
+
+    const merged = Array.from(byId.values())
+    writeAll(merged)
+    return { imported, skipped, total: merged.length }
   },
 }
