@@ -7,6 +7,7 @@ import { ClassicalText } from '@/components/hexagram/ClassicalText'
 import { InterpretationSection } from '@/components/hexagram/InterpretationSection'
 import { SituationMapping } from '@/components/hexagram/SituationMapping'
 import { YaoTimeline } from '@/components/hexagram/YaoTimeline'
+import { YaoLocator } from '@/components/yao-locator/YaoLocator'
 import { ActionSummary } from '@/components/hexagram/ActionSummary'
 import { RelatedHexagrams } from '@/components/hexagram/RelatedHexagrams'
 import { FloatingBackBar } from '@/components/hexagram/FloatingBackBar'
@@ -53,6 +54,9 @@ export default async function HexagramDetailPage({ params, searchParams }: Props
         <ClassicalText hexagram={hexagram} />
         <InterpretationSection hexagram={hexagram} />
         <SituationMapping hexagram={hexagram} />
+        <section className="py-12">
+          <YaoLocator yao={hexagram.yao} hexagramName={hexagram.name.chinese} />
+        </section>
         <YaoTimeline hexagram={hexagram} highlightPhase={highlightPhase} />
         <ActionSummary hexagram={hexagram} />
         <RelatedHexagrams hexagram={hexagram} />

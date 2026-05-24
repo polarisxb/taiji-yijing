@@ -5,6 +5,7 @@ import { ChevronDown } from 'lucide-react'
 import type { MatchResult, Yao } from '@/lib/types'
 import { HexagramSymbol } from './HexagramSymbol'
 import { SmoothExpand } from './SmoothExpand'
+import { YaoLocator } from './yao-locator/YaoLocator'
 import { useCountUp, useScrollReveal } from '@/hooks/useAnimations'
 import Link from 'next/link'
 
@@ -119,15 +120,18 @@ export function MatchCard({ match, rank }: Props) {
           </Section>
 
           <Section label="六爻 · 事之六阶" icon="爻">
-            <div className="space-y-2">
-              {hexagram.yao.map((y) => (
-                <YaoRow
-                  key={y.position}
-                  yao={y}
-                  open={openYao === y.position}
-                  onToggle={() => setOpenYao(openYao === y.position ? null : y.position)}
-                />
-              ))}
+            <div className="space-y-4">
+              {rank === 1 && <YaoLocator yao={hexagram.yao} hexagramName={hexagram.name.chinese} />}
+              <div className="space-y-2">
+                {hexagram.yao.map((y) => (
+                  <YaoRow
+                    key={y.position}
+                    yao={y}
+                    open={openYao === y.position}
+                    onToggle={() => setOpenYao(openYao === y.position ? null : y.position)}
+                  />
+                ))}
+              </div>
             </div>
           </Section>
 
