@@ -11,6 +11,7 @@ import { YaoLocator } from '@/components/yao-locator/YaoLocator'
 import { ActionSummary } from '@/components/hexagram/ActionSummary'
 import { RelatedHexagrams } from '@/components/hexagram/RelatedHexagrams'
 import { FloatingBackBar } from '@/components/hexagram/FloatingBackBar'
+import { HistoryNavLink } from '@/components/zheng/HistoryNavLink'
 import type { Phase } from '@/lib/types'
 import type { Metadata } from 'next'
 import Link from 'next/link'
@@ -66,12 +67,15 @@ export default async function HexagramDetailPage({ params, searchParams }: Props
           <div className="divider-classical mb-8">
             <span className="font-serif text-lg">☯</span>
           </div>
-          <Link
-            href="/hexagrams"
-            className="text-xs font-serif text-[var(--color-ink-400)] hover:text-[var(--color-vermillion)] transition-colors"
-          >
-            览六十四卦
-          </Link>
+          <div className="flex items-center justify-center gap-4">
+            <Link
+              href="/hexagrams"
+              className="text-xs font-serif text-[var(--color-ink-400)] hover:text-[var(--color-vermillion)] transition-colors"
+            >
+              览六十四卦
+            </Link>
+            <HistoryNavLink className="text-xs font-serif text-[var(--color-ink-400)] hover:text-[var(--color-vermillion)] transition-colors before:content-['·'] before:mr-4 before:text-[var(--color-ink-300)]" />
+          </div>
         </footer>
       </div>
     </>

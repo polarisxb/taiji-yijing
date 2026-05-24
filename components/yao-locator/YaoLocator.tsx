@@ -1,17 +1,19 @@
 'use client'
 
-import { useState } from 'react'
+import { useMemo, useRef, useEffect, useState } from 'react'
 import type { Yao } from '@/lib/types'
-import { scoreYao } from '@/lib/yao-locator'
+import { scoreYao, type LocatorResult as LocatorResultData } from '@/lib/yao-locator'
 import { IndicatorChecklist } from './IndicatorChecklist'
 import { LocatorResult } from './LocatorResult'
 
 type Props = {
   yao: Yao[]
   hexagramName: string
+  /** Called when the user submits a result (with data) or resets (with null). */
+  onResultChange?: (result: LocatorResultData | null) => void
 }
 
-export function YaoLocator({ yao, hexagramName }: Props) {
+export function YaoLocator({ yao, hexagramName, onResultChange }: Props) {
   const [selected, setSelected] = useState<Set<string>>(new Set())
   const [submitted, setSubmitted] = useState(false)
 
@@ -37,7 +39,18 @@ export function YaoLocator({ yao, hexagramName }: Props) {
     setSubmitted(false)
   }
 
-  const result = submitted ? scoreYao(yao, selected) : null
+  // Memo on [yao, selected, submitted] so the result reference is stable across
+  // unrelated re-renders, avoiding infinite useEffect loops in parents.
+  const result = useMemo<LocatorResultData | null>(
+    () => (submitted ? scoreYao(yao, selected) : null),
+    [yao, selected, submitted],
+  )
+
+  const cbRef = useRef(onResultChange)
+  cbRef.current = onResultChange
+  useEffect(() => {
+    cbRef.current?.(result)
+  }, [result])
 
   return (
     <section className="card-classical rounded-lg p-5 md:p-6 space-y-5">

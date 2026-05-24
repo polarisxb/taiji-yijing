@@ -9,6 +9,7 @@ import { DivinationLoader } from '@/components/DivinationLoader'
 import { HexagramSymbol } from '@/components/HexagramSymbol'
 import { ReasoningPanel } from '@/components/ReasoningPanel'
 import { StreamingText } from '@/components/StreamingText'
+import { HistoryNavLink } from '@/components/zheng/HistoryNavLink'
 import { useStreamingConsult } from '@/hooks/useStreamingConsult'
 import { findHexagramByNumber } from '@/lib/hexagram-utils'
 import type { ConsultResponse } from '@/lib/types'
@@ -373,7 +374,11 @@ export default function Home() {
             <div className="space-y-6">
               {classicResult.matches.map((m, i) => (
                 <div key={m.hexagram.number} className={`animate-stagger-${i + 1}`}>
-                  <MatchCard match={m} rank={i + 1} />
+                  <MatchCard
+                    match={m}
+                    rank={i + 1}
+                    situation={i === 0 ? situation.trim() : undefined}
+                  />
                 </div>
               ))}
             </div>
@@ -420,6 +425,7 @@ export default function Home() {
               <p className="text-[var(--color-ink-300)] text-[10px] font-serif tracking-wide">
                 以义解经 · 以象观变 · 以诚待人
               </p>
+              <HistoryNavLink className="inline-block text-[10px] font-serif text-[var(--color-ink-400)] hover:text-[var(--color-vermillion)] transition-colors" />
             </div>
           </div>
         </footer>
