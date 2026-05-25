@@ -245,7 +245,7 @@ export default function Home() {
         {/* ——— Loading ——— */}
         {loading && (
           <div className="space-y-4">
-            <DivinationLoader />
+            <DivinationLoader variant={mode} />
             {mode === 'ai' && (
               <div className="text-center">
                 <button
@@ -264,7 +264,9 @@ export default function Home() {
         {error && !loading && (
           <div className="mb-8 animate-fade-up">
             <InlineErrorState
-              message={error}
+              message={
+                mode === 'ai' ? `AI 暂时被打断了 · ${error}。重试一下，或者补几句再问。` : error
+              }
               onRetry={situation.trim() ? handleSubmit : undefined}
             />
           </div>
@@ -273,9 +275,9 @@ export default function Home() {
         {/* ——— AI Empty Result ——— */}
         {mode === 'ai' && ai.done && !ai.matchData && !ai.error && !ai.loading && (
           <div className="mb-8 p-6 border border-[var(--color-ink-200)] rounded bg-[var(--color-paper-light)] text-center text-sm font-serif text-[var(--color-ink-600)] leading-relaxed animate-fade-up">
-            <p>未匹配到合适的卦象。这通常意味着情境描述不够具体——</p>
+            <p>看了你的局，AI 暂时未能定下一卦。</p>
             <p className="mt-2 text-xs text-[var(--color-ink-400)]">
-              补充关键细节（你的角色 / 当前阶段 / 最关心什么）后再问一次。
+              试着补几句——你的角色 / 当前最关心什么 / 已经做过什么——AI 会更懂你。
             </p>
           </div>
         )}
