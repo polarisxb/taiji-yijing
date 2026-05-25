@@ -29,15 +29,13 @@ export function StreamingText({ text, done = false, className = '' }: Props) {
         const isLastPara = pIdx === paragraphs.length - 1
         return (
           <p key={pIdx} className={pIdx > 0 ? 'mt-3' : ''}>
-            {sentences.map((sentence, sIdx) => {
-              const isLastSentence = isLastPara && sIdx === sentences.length - 1
-              return (
-                <span key={sIdx} className="animate-fade-segment">
-                  {sentence}
-                  {!isLastSentence ? ' ' : ''}
-                </span>
-              )
-            })}
+            {sentences.map((sentence, sIdx) => (
+              // 中文句间不插空格：splitInterpretationParagraphs 已经把
+              // 。！？ 终止符附在句尾，直接拼接即可
+              <span key={sIdx} className="animate-fade-segment">
+                {sentence}
+              </span>
+            ))}
             {isLastPara && !done && (
               <span
                 className="inline-block ml-0.5 align-middle animate-pulse"
