@@ -208,11 +208,7 @@ describe('AiResultCard — SaveConsultationButton', () => {
     expect(screen.queryByText(/记此一卦/)).not.toBeInTheDocument()
   })
 
-  it('renders save button when situation is non-empty (PR-1 baseline)', () => {
-    // NOTE: This test asserts PR-1 behavior — save button renders whenever
-    // situation.trim() is truthy. PR-2 adds an additional `done` gate (so the
-    // button only appears after streaming completes); PR-2 updates this test
-    // to reflect that gate.
+  it('renders save button when situation non-empty AND done (PR-2 gate)', () => {
     render(
       <AiResultCard
         hexagram={makeHexagram()}
@@ -223,6 +219,21 @@ describe('AiResultCard — SaveConsultationButton', () => {
       />,
     )
     expect(screen.getByText(/记此一卦/)).toBeInTheDocument()
+  })
+
+  it('does NOT render save button while streaming is in progress (done=false)', () => {
+    // PR-2 / F (rhythm) adds a `done` gate so the save button only appears
+    // after streaming finishes, giving the user space to read before acting.
+    render(
+      <AiResultCard
+        hexagram={makeHexagram()}
+        matchData={makeMatch()}
+        interpretation="streaming partial text..."
+        done={false}
+        situation="我在做一个决定"
+      />,
+    )
+    expect(screen.queryByText(/记此一卦/)).not.toBeInTheDocument()
   })
 })
 
