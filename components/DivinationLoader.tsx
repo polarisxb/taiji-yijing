@@ -22,8 +22,10 @@ type Props = {
 export function DivinationLoader({ variant = 'classic' }: Props) {
   const [step, setStep] = useState(0)
   const intervalMs = variant === 'ai' ? 500 : 350
-  const flickerColor = variant === 'ai' ? '#a89884' : 'var(--color-vermillion)'
-  const dotColor = variant === 'ai' ? '#a89884' : 'var(--color-vermillion)'
+  // AI 暖灯 / classic 朱砂 —— 颜色全走 globals.css CSS 变量，不硬编 hex
+  // (.windsurfrules: "CSS variables for all colors")
+  const flickerColor = variant === 'ai' ? 'var(--color-warm)' : 'var(--color-vermillion)'
+  const dotColor = variant === 'ai' ? 'var(--color-warm)' : 'var(--color-vermillion)'
 
   useEffect(() => {
     const timer = setInterval(() => {
