@@ -39,7 +39,9 @@ export function RecordCard({ record }: { record: ConsultationRecord }) {
           {record.hexagramName}
         </span>
         {record.consultMode === 'ai' && (
-          <span className="text-[10px] font-serif tracking-wide text-[#a89884]">· AI</span>
+          <span className="text-[10px] font-serif tracking-wide text-[var(--color-warm)]">
+            · AI
+          </span>
         )}
         {record.yaoLocation && (
           <span className="text-[10px] font-serif text-[var(--color-ink-400)]">

@@ -29,6 +29,11 @@
   --color-gold-dark: #8a6e1a;
 
   --color-accent: #b8962c;
+
+  /* 暖灰系 (AI 模式 accent — 区别于经典模式冷墨) */
+  --color-warm: #a89884; /* 暖灰：AI 卡左边框 / list AI 标识 */
+  --color-warm-text: #7a6e5d; /* 暖棕：定见徽章文字 */
+  --color-warm-border: #c4b99a; /* 暖金：定见徽章 + AI 定位竖线 */
 }
 
 html {

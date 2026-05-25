@@ -89,10 +89,10 @@ describe('AiResultCard — confidence badge', () => {
     const badge = screen.getByLabelText('AI 确信度 定见')
     expect(badge).toBeInTheDocument()
     expect(badge.textContent).toBe('定见')
-    // 暖纸/暖棕/暖金 palette — 与冷墨经典模式区分开
-    expect(badge.className).toContain('#f5f0e8')
-    expect(badge.className).toContain('#7a6e5d')
-    expect(badge.className).toContain('#c4b99a')
+    // 暖纸/暖棕/暖金 palette — 走 CSS 变量（globals.css @theme），不硬编 hex
+    expect(badge.className).toContain('var(--color-paper)')
+    expect(badge.className).toContain('var(--color-warm-text)')
+    expect(badge.className).toContain('var(--color-warm-border)')
   })
 
   it('renders 待审 badge with amber palette class for medium confidence', () => {

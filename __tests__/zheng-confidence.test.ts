@@ -47,11 +47,19 @@ describe('getConfidenceBadge', () => {
   })
 
   it('uses warm 暖纸/暖棕/暖金 palette for high (义理派定见)', () => {
-    // 高确信走暖色调（与冷墨经典模式区分开）
+    // 高确信走暖色调（与冷墨经典模式区分开），颜色一律走 CSS 变量（globals.css @theme）
     const cls = getConfidenceBadge('high').colorClass
-    expect(cls).toContain('#f5f0e8') // 暖纸底
-    expect(cls).toContain('#7a6e5d') // 暖棕字
-    expect(cls).toContain('#c4b99a') // 暖金边
+    expect(cls).toContain('var(--color-paper)') // 暖纸底
+    expect(cls).toContain('var(--color-warm-text)') // 暖棕字
+    expect(cls).toContain('var(--color-warm-border)') // 暖金边
+  })
+
+  it('does NOT hardcode hex values (CSS variable rule from .windsurfrules)', () => {
+    // .windsurfrules: "CSS variables for all colors"。任何 hex 出现都视为回归。
+    for (const c of ['high', 'medium', 'low'] as const) {
+      const cls = getConfidenceBadge(c).colorClass
+      expect(cls).not.toMatch(/#[0-9a-fA-F]{3,8}/)
+    }
   })
 
   it('uses amber palette for medium (待审)', () => {

@@ -26,7 +26,7 @@ export function AiResultCard({ hexagram, matchData, interpretation, done, situat
       className="card-classical rounded-lg p-8 border-l-2"
       style={{
         animation: 'fadeUp 0.7s cubic-bezier(0.16,1,0.3,1) 0.15s both',
-        borderLeftColor: '#a89884',
+        borderLeftColor: 'var(--color-warm)',
       }}
     >
       {/* 卦首 */}
@@ -59,7 +59,7 @@ export function AiResultCard({ hexagram, matchData, interpretation, done, situat
       </div>
 
       {/* AI 定位（爻位 + brief）*/}
-      <div className="mb-6 pl-4 border-l-2 border-[#c4b99a]/60">
+      <div className="mb-6 pl-4 border-l-2 border-[var(--color-warm-border)]/60">
         <div className="text-[10px] tracking-[0.2em] text-[var(--color-ink-400)] mb-1.5 font-serif">
           AI 定位 · {yaoName}
         </div>
