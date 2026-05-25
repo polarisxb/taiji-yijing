@@ -47,4 +47,29 @@ describe('authErrorToMessage', () => {
     const msg = authErrorToMessage(fakeAuthError as Error)
     expect(msg).toContain('邮箱或密码')
   })
+
+  it('translates not authenticated (account deletion / restore preconditions)', () => {
+    const msg = authErrorToMessage(new Error('not authenticated'))
+    expect(msg).toMatch(/未登录|重新/)
+  })
+
+  it('translates account not deleted (restore called on active account)', () => {
+    const msg = authErrorToMessage(new Error('account not deleted'))
+    expect(msg).toMatch(/未注销|无需/)
+  })
+
+  it('translates restore window expired', () => {
+    const msg = authErrorToMessage(new Error('restore window expired'))
+    expect(msg).toMatch(/30 天|超过|过期/)
+  })
+
+  it('translates email change required new email different', () => {
+    const msg = authErrorToMessage(new Error('New email address should be different'))
+    expect(msg).toMatch(/邮箱|不能|不同/)
+  })
+
+  it('translates email already registered (signup conflict)', () => {
+    const msg = authErrorToMessage(new Error('Email address is already registered'))
+    expect(msg).toMatch(/已注册/)
+  })
 })

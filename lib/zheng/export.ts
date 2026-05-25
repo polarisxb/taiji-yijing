@@ -20,13 +20,28 @@ export function exportToJson(records: ConsultationRecord[]): ZhengExport {
   }
 }
 
+export type ExportFilenameOptions = {
+  /** 数据来源；未指定时输出无后缀的兼容文件名 */
+  source?: 'local' | 'cloud'
+}
+
 /**
- * 生成下载用的文件名，例如 `taiji-yijing-zheng-2026-05-24.json`。
+ * 生成下载用的文件名。
+ *
+ * - 默认（无 source）：`taiji-yijing-zheng-YYYY-MM-DD.json`
+ * - source='local'：`taiji-yijing-zheng-LOCAL-YYYY-MM-DD.json`
+ * - source='cloud'：`taiji-yijing-zheng-CLOUD-YYYY-MM-DD.json`
+ *
+ * 加 LOCAL/CLOUD 后缀避免用户在 A 包上云后混淆"这个备份是本机还是云端的"。
  */
-export function exportFilename(at: number = Date.now()): string {
+export function exportFilename(
+  at: number = Date.now(),
+  options: ExportFilenameOptions = {},
+): string {
   const d = new Date(at)
   const yyyy = d.getFullYear()
   const mm = String(d.getMonth() + 1).padStart(2, '0')
   const dd = String(d.getDate()).padStart(2, '0')
-  return `taiji-yijing-zheng-${yyyy}-${mm}-${dd}.json`
+  const tag = options.source === 'local' ? 'LOCAL-' : options.source === 'cloud' ? 'CLOUD-' : ''
+  return `taiji-yijing-zheng-${tag}${yyyy}-${mm}-${dd}.json`
 }

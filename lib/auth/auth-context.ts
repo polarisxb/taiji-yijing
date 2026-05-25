@@ -18,6 +18,12 @@ export type AuthContextValue = {
   signUpWithPassword: (email: string, password: string) => Promise<AuthMethodResult>
   resetPasswordForEmail: (email: string) => Promise<AuthMethodResult>
   updatePassword: (newPassword: string) => Promise<AuthMethodResult>
+  /** 调用后 Supabase 会发验证邮件到新地址；未点验证 link 前邮箱不会变更 */
+  updateEmail: (newEmail: string) => Promise<AuthMethodResult>
+  /** 请求注销账号（30 天软删、可撤回） */
+  requestAccountDeletion: () => Promise<AuthMethodResult>
+  /** 30 天内撤回注销账号 */
+  restoreAccount: () => Promise<AuthMethodResult>
   signOut: () => Promise<void>
 }
 

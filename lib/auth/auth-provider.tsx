@@ -6,7 +6,7 @@
  * 职责：
  * - 初始化时 getSession()
  * - 订阅 onAuthStateChange 维护 user/session 状态
- * - 暴露 signInWithPassword / signUpWithPassword / signOut / resetPasswordForEmail / updatePassword
+ * - 暴露 signInWithPassword / signUpWithPassword / signOut / resetPasswordForEmail / updatePassword / updateEmail / requestAccountDeletion / restoreAccount
  * - Supabase 未配置时优雅降级（视为永远未登录）
  *
  * 测试时通过 `getSupabase` prop 注入 mock client。
@@ -115,6 +115,27 @@ export function AuthProvider({ children, getSupabase }: AuthProviderProps) {
     [supabase],
   )
 
+  const updateEmail = useCallback(
+    async (newEmail: string): Promise<AuthMethodResult> => {
+      if (!supabase) return { error: NOT_CONFIGURED_ERROR }
+      const { error } = await supabase.auth.updateUser({ email: newEmail })
+      return { error }
+    },
+    [supabase],
+  )
+
+  const requestAccountDeletion = useCallback(async (): Promise<AuthMethodResult> => {
+    if (!supabase) return { error: NOT_CONFIGURED_ERROR }
+    const { error } = await supabase.rpc('request_account_deletion')
+    return { error }
+  }, [supabase])
+
+  const restoreAccount = useCallback(async (): Promise<AuthMethodResult> => {
+    if (!supabase) return { error: NOT_CONFIGURED_ERROR }
+    const { error } = await supabase.rpc('restore_account')
+    return { error }
+  }, [supabase])
+
   const signOut = useCallback(async () => {
     if (!supabase) return
     await supabase.auth.signOut()
@@ -130,6 +151,9 @@ export function AuthProvider({ children, getSupabase }: AuthProviderProps) {
     signUpWithPassword,
     resetPasswordForEmail,
     updatePassword,
+    updateEmail,
+    requestAccountDeletion,
+    restoreAccount,
     signOut,
   }
 

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { exportToJson } from '@/lib/zheng/export'
+import { exportToJson, exportFilename } from '@/lib/zheng/export'
 import type { ConsultationRecord } from '@/lib/zheng/types'
 
 function record(overrides: Partial<ConsultationRecord> = {}): ConsultationRecord {
@@ -56,5 +56,25 @@ describe('exportToJson', () => {
     const json = JSON.stringify(out)
     const parsed = JSON.parse(json)
     expect(parsed).toEqual(out)
+  })
+})
+
+describe('exportFilename', () => {
+  const FIXED = new Date(2026, 4, 24).getTime()
+
+  it('defaults to taiji-yijing-zheng-YYYY-MM-DD.json (no source suffix)', () => {
+    expect(exportFilename(FIXED)).toBe('taiji-yijing-zheng-2026-05-24.json')
+  })
+
+  it('adds LOCAL suffix when source="local"', () => {
+    expect(exportFilename(FIXED, { source: 'local' })).toBe(
+      'taiji-yijing-zheng-LOCAL-2026-05-24.json',
+    )
+  })
+
+  it('adds CLOUD suffix when source="cloud"', () => {
+    expect(exportFilename(FIXED, { source: 'cloud' })).toBe(
+      'taiji-yijing-zheng-CLOUD-2026-05-24.json',
+    )
   })
 })

@@ -4,7 +4,9 @@ import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { zhengStore } from '@/lib/zheng/store'
 import { exportToJson, exportFilename } from '@/lib/zheng/export'
+import { exportToMarkdown, exportMarkdownFilename } from '@/lib/zheng/export-markdown'
 import { parseImport } from '@/lib/zheng/import'
+import { useAuth } from '@/lib/auth/use-auth'
 import type { ZhengExport } from '@/lib/zheng/export-schema'
 import { ImportConflictDialog } from './ImportConflictDialog'
 import { ClearAllDialog } from './ClearAllDialog'
@@ -15,6 +17,7 @@ type Toast = { kind: 'info' | 'error'; message: string } | null
 
 export function SettingsPanel() {
   const router = useRouter()
+  const { user } = useAuth()
   const [count, setCount] = useState<number | null>(null)
   const [toast, setToast] = useState<Toast>(null)
   const [importPending, setImportPending] = useState<ZhengExport | null>(null)
@@ -35,20 +38,40 @@ export function SettingsPanel() {
     setCount(records.length)
   }
 
+  function activeSource(): 'local' | 'cloud' {
+    return user ? 'cloud' : 'local'
+  }
+
   async function handleExport() {
     const records = await zhengStore.listRecords()
     const wrapper = exportToJson(records)
     const json = JSON.stringify(wrapper, null, 2)
-    const blob = new Blob([json], { type: 'application/json' })
+    triggerDownload(
+      json,
+      'application/json',
+      exportFilename(wrapper.exportedAt, { source: activeSource() }),
+    )
+    showToast('info', `已导出 ${records.length} 条记录（JSON）`)
+  }
+
+  async function handleExportMarkdown() {
+    const records = await zhengStore.listRecords()
+    const now = Date.now()
+    const md = exportToMarkdown(records, { now })
+    triggerDownload(md, 'text/markdown;charset=utf-8', exportMarkdownFilename(now))
+    showToast('info', `已导出 ${records.length} 条记录（Markdown）`)
+  }
+
+  function triggerDownload(content: string, mime: string, filename: string) {
+    const blob = new Blob([content], { type: mime })
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
-    a.download = exportFilename(wrapper.exportedAt)
+    a.download = filename
     document.body.appendChild(a)
     a.click()
     document.body.removeChild(a)
     URL.revokeObjectURL(url)
-    showToast('info', `已导出 ${records.length} 条记录`)
   }
 
   async function handleImportFile(file: File) {
@@ -93,7 +116,7 @@ export function SettingsPanel() {
         </h2>
         <div className="card-classical rounded-lg p-6 space-y-6">
           <div className="text-sm font-serif text-[var(--color-ink-700)]">
-            当前本地共有{' '}
+            {user ? '当前云端共有' : '当前本地共有'}{' '}
             <span className="font-bold text-[var(--color-ink-900)]">
               {count === null ? '…' : count}
             </span>{' '}
@@ -105,13 +128,31 @@ export function SettingsPanel() {
             <div>
               <div className="font-serif text-sm text-[var(--color-ink-900)]">导出 JSON</div>
               <p className="text-xs font-serif text-[var(--color-ink-400)] mt-1">
-                下载完整记录的 JSON 文件，作为本地备份或迁移使用。
+                下载完整记录的 JSON 文件，作为备份或迁移使用。
               </p>
             </div>
             <button
               type="button"
               disabled={!count}
               onClick={handleExport}
+              className="text-sm font-serif px-4 py-2 rounded border border-[var(--color-ink-900)] text-[var(--color-ink-900)] hover:bg-[var(--color-ink-900)] hover:text-[var(--color-paper)] transition-colors disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:text-[var(--color-ink-900)] shrink-0"
+            >
+              导出
+            </button>
+          </div>
+
+          {/* Export Markdown */}
+          <div className="flex items-center justify-between gap-4 border-t border-[var(--color-ink-100)] pt-4">
+            <div>
+              <div className="font-serif text-sm text-[var(--color-ink-900)]">导出 Markdown</div>
+              <p className="text-xs font-serif text-[var(--color-ink-400)] mt-1">
+                人可读的决策档案备份；包含情境、卦象、笔记与应验状态。
+              </p>
+            </div>
+            <button
+              type="button"
+              disabled={!count}
+              onClick={handleExportMarkdown}
               className="text-sm font-serif px-4 py-2 rounded border border-[var(--color-ink-900)] text-[var(--color-ink-900)] hover:bg-[var(--color-ink-900)] hover:text-[var(--color-paper)] transition-colors disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:text-[var(--color-ink-900)] shrink-0"
             >
               导出
