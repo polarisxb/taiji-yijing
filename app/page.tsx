@@ -1,19 +1,14 @@
 'use client'
 
 import { useState } from 'react'
-import Link from 'next/link'
 import { MatchCard } from '@/components/MatchCard'
 import { TaijiSymbol } from '@/components/TaijiSymbol'
 import { Atmosphere } from '@/components/Atmosphere'
 import { DivinationLoader } from '@/components/DivinationLoader'
-import { HexagramSymbol } from '@/components/HexagramSymbol'
 import { InlineErrorState } from '@/components/InlineErrorState'
-import { ReasoningPanel } from '@/components/ReasoningPanel'
-import { StreamingText } from '@/components/StreamingText'
+import { AiResultCard } from '@/components/AiResultCard'
 import { HistoryNavLink } from '@/components/zheng/HistoryNavLink'
-import { SaveConsultationButton } from '@/components/zheng/SaveConsultationButton'
 import { useStreamingConsult } from '@/hooks/useStreamingConsult'
-import { confidenceToScore } from '@/lib/zheng/confidence'
 import { findHexagramByNumber } from '@/lib/hexagram-utils'
 import type { ConsultResponse } from '@/lib/types'
 
@@ -289,93 +284,39 @@ export default function Home() {
         {mode === 'ai' && ai.matchData && aiHexagram && (
           <section>
             <div
-              className="divider-classical divider-animated mb-10"
+              className="divider-classical divider-animated mb-4"
               style={{ animation: 'fadeUp 0.6s cubic-bezier(0.16,1,0.3,1) 0s both' }}
             >
               <span className="font-serif">卦 · 象 · 辞</span>
             </div>
 
-            <div
-              className="card-classical rounded-lg p-8"
-              style={{ animation: 'fadeUp 0.7s cubic-bezier(0.16,1,0.3,1) 0.15s both' }}
+            <p
+              className="text-center text-[10px] tracking-[0.3em] text-[var(--color-ink-400)] font-serif mb-8"
+              style={{ animation: 'fadeUp 0.6s cubic-bezier(0.16,1,0.3,1) 0.1s both' }}
             >
-              {/* 卦首 */}
-              <div className="flex items-center gap-6 mb-6">
-                <div
-                  className="hexagram-display flex items-center justify-center w-20 h-20 rounded-lg"
-                  style={{ animation: 'breathe 3s ease-in-out infinite' }}
-                >
-                  <HexagramSymbol binary={aiHexagram.binary} size="lg" />
-                </div>
-                <div>
-                  <h2 className="font-serif text-3xl text-[var(--color-ink-900)] tracking-wider">
-                    {aiHexagram.name.chinese}
-                  </h2>
-                  <p className="text-sm text-[var(--color-ink-400)] font-serif mt-1">
-                    {aiHexagram.name.pinyin} · 第{aiHexagram.number}卦
-                  </p>
-                </div>
-              </div>
+              以情境取象 · 由你的局直入义理脉络
+            </p>
 
-              {/* 推理面板 */}
-              <ReasoningPanel
-                reasoning={ai.matchData.reasoning}
-                confidence={ai.matchData.confidence}
-              />
-
-              {/* 个性化解读 */}
-              {ai.interpretation && (
-                <div className="mt-6 pt-6 border-t border-[var(--color-ink-100)]">
-                  <div className="text-[10px] tracking-[0.2em] text-[var(--color-ink-400)] mb-3 font-serif">
-                    专属解读
-                  </div>
-                  <StreamingText text={ai.interpretation} done={ai.done} />
-                </div>
-              )}
-
-              {/* 深入此卦 */}
-              <div className="mt-6 pt-6 border-t border-[var(--color-ink-100)] flex items-center justify-between">
-                <Link
-                  href={`/hexagram/${aiHexagram.number}?phase=${ai.matchData.yaoPosition}`}
-                  className="text-sm text-[var(--color-vermillion)] font-serif hover:underline"
-                >
-                  深入此卦 →
-                </Link>
-                {ai.matchData.yaoConfidence && (
-                  <span className="text-[10px] text-[var(--color-ink-400)] font-serif">
-                    第{ai.matchData.yaoPosition}爻 · {ai.matchData.yaoBrief}
-                  </span>
-                )}
-              </div>
-
-              {/* 记此一卦 */}
-              {situation.trim() && (
-                <SaveConsultationButton
-                  situation={situation.trim()}
-                  hexagramId={aiHexagram.number}
-                  hexagramName={aiHexagram.name.chinese}
-                  fitScore={confidenceToScore(ai.matchData.confidence)}
-                  aiYao={{
-                    position: ai.matchData.yaoPosition as 1 | 2 | 3 | 4 | 5 | 6,
-                    name:
-                      aiHexagram.yao[ai.matchData.yaoPosition - 1]?.name ??
-                      `第${ai.matchData.yaoPosition}爻`,
-                    brief: ai.matchData.yaoBrief,
-                    confidence: ai.matchData.confidence,
-                  }}
-                  consultMode="ai"
-                />
-              )}
-            </div>
+            <AiResultCard
+              hexagram={aiHexagram}
+              matchData={ai.matchData}
+              interpretation={ai.interpretation}
+              done={ai.done}
+              situation={situation}
+            />
           </section>
         )}
 
         {/* ——— Classic Results ——— */}
         {mode === 'classic' && classicResult && (
           <section>
-            <div className="divider-classical mb-10 animate-fade-up">
+            <div className="divider-classical mb-4 animate-fade-up">
               <span className="font-serif">卦 · 象 · 辞</span>
             </div>
+
+            <p className="text-center text-[10px] tracking-[0.3em] text-[var(--color-ink-400)] font-serif mb-8 animate-fade-up">
+              以结构定象 · 由 64 卦原型与你的局相参
+            </p>
 
             <header className="flex items-baseline justify-between mb-8 animate-fade-up">
               <h2 className="font-serif text-3xl text-[var(--color-ink-900)] tracking-wider">
@@ -386,7 +327,10 @@ export default function Home() {
 
             {(Object.keys(classicResult.extractedFeatures).length > 0 ||
               classicResult.extractedKeywords.length > 0) && (
-              <details className="text-xs text-[var(--color-ink-400)] bg-[var(--color-paper-light)] border border-[var(--color-ink-100)] rounded p-4 mb-8 animate-fade-up">
+              <details
+                open
+                className="text-xs text-[var(--color-ink-400)] bg-[var(--color-paper-light)] border border-[var(--color-ink-100)] rounded p-4 mb-8 animate-fade-up"
+              >
                 <summary className="cursor-pointer hover:text-[var(--color-ink-600)] font-serif tracking-wide">
                   观系统所取之象
                 </summary>

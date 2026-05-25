@@ -18,13 +18,50 @@ export function confidenceToScore(confidence: AiConfidence): number {
   }
 }
 
+/**
+ * 义理派表达：AI 的把握以文字而非数字表达。
+ * - 定见：AI 有把握
+ * - 待审：AI 觉得方向对但需用户自审
+ * - 审慎：AI 拿不准，请用户审慎参考
+ */
 export function confidenceLabel(confidence: AiConfidence): string {
   switch (confidence) {
     case 'high':
-      return '高'
+      return '定见'
     case 'medium':
-      return '中'
+      return '待审'
     case 'low':
-      return '低'
+      return '审慎'
+  }
+}
+
+/**
+ * AI confidence 徽章的视觉表达（label + tailwind 颜色类）。
+ *
+ * 单一来源——所有展示 AI confidence 徽章的组件
+ * （ReasoningPanel, AiResultCard, history detail, RecordCard）都应取这里，
+ * 不要各自重新定义文案/颜色，否则改一处忘三处。
+ *
+ * 颜色策略：
+ * - 定见 = 暖纸（--color-paper） / 暖棕（--color-warm-text） / 暖金（--color-warm-border）
+ *   ——本产品颜色一律走 globals.css 的 CSS 变量，不硬编 hex。
+ * - 待审 = amber（标准 tailwind 警示偏温）
+ * - 审慎 = rose（标准 tailwind 谨慎偏冷）
+ */
+export type ConfidenceBadge = {
+  label: string
+  colorClass: string
+}
+
+const CONFIDENCE_COLOR_CLASS: Record<AiConfidence, string> = {
+  high: 'text-[var(--color-warm-text)] bg-[var(--color-paper)] border-[var(--color-warm-border)]',
+  medium: 'text-amber-700 bg-amber-50 border-amber-300',
+  low: 'text-rose-700 bg-rose-50 border-rose-300',
+}
+
+export function getConfidenceBadge(confidence: AiConfidence): ConfidenceBadge {
+  return {
+    label: confidenceLabel(confidence),
+    colorClass: CONFIDENCE_COLOR_CLASS[confidence],
   }
 }
