@@ -1,6 +1,8 @@
 import type { Metadata } from 'next'
 import './globals.css'
 
+import { AuthProvider } from '@/lib/auth/auth-provider'
+
 export const metadata: Metadata = {
   title: '太极 · 易经决策框架',
   description:
@@ -16,7 +18,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           rel="stylesheet"
         />
       </head>
-      <body className="min-h-screen antialiased animate-page-enter">{children}</body>
+      <body className="min-h-screen antialiased animate-page-enter">
+        <AuthProvider>{children}</AuthProvider>
+      </body>
     </html>
   )
 }
