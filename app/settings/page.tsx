@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { AccountSection } from '@/components/auth/AccountSection'
 import { Atmosphere } from '@/components/Atmosphere'
 import { SettingsPanel } from '@/components/zheng/settings/SettingsPanel'
 
@@ -12,9 +13,11 @@ export default function SettingsPage() {
             设置
           </h1>
           <p className="mt-4 text-xs tracking-[0.4em] text-[var(--color-ink-400)] font-serif">
-            管理「履」中的本地数据
+            管理「履」中的数据
           </p>
         </header>
+
+        <AccountSection />
 
         <SettingsPanel />
 

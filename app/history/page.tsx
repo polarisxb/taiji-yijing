@@ -1,9 +1,11 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import Link from 'next/link'
 import { Atmosphere } from '@/components/Atmosphere'
+import { MigrationOrchestrator } from '@/components/auth/MigrationOrchestrator'
 import { RecordCard } from '@/components/zheng/RecordCard'
+import { useAuth } from '@/lib/auth/use-auth'
 import { zhengStore } from '@/lib/zheng/store'
 import type { ConsultationRecord, VerificationStatus } from '@/lib/zheng/types'
 
@@ -18,12 +20,18 @@ const FILTERS: { value: Filter; label: string }[] = [
 ]
 
 export default function HistoryListPage() {
+  const { user, loading } = useAuth()
   const [records, setRecords] = useState<ConsultationRecord[] | null>(null)
   const [filter, setFilter] = useState<Filter>('all')
 
-  useEffect(() => {
+  const refresh = useCallback(() => {
     zhengStore.listRecords().then(setRecords)
   }, [])
+
+  useEffect(() => {
+    if (loading) return
+    refresh()
+  }, [loading, user, refresh])
 
   const filtered = records
     ? filter === 'all'
@@ -40,16 +48,37 @@ export default function HistoryListPage() {
             履
           </h1>
           <p className="mt-4 text-xs tracking-[0.4em] text-[var(--color-ink-400)] font-serif">
-            走过的路 · 暂存本地 — 后续会同步到账号
+            走过的路 · {loading ? '载入中…' : user ? '已同步到云端' : '暂存本地'}
           </p>
-          <Link
-            href="/settings"
-            aria-label="管理本地数据"
-            title="管理本地数据"
-            className="absolute right-0 top-0 text-xs font-serif text-[var(--color-ink-400)] hover:text-[var(--color-vermillion)] transition-colors"
-          >
-            管理 ⚙
-          </Link>
+          <div className="absolute right-0 top-0 flex items-center gap-3">
+            {loading ? null : user ? (
+              <Link
+                href="/settings"
+                aria-label={`账号 ${user.email ?? ''}`}
+                title={user.email ?? '已登录'}
+                className="text-xs font-serif text-[var(--color-ink-400)] hover:text-[var(--color-vermillion)] transition-colors"
+              >
+                {user.email ? user.email.split('@')[0] : '账号'}
+              </Link>
+            ) : (
+              <Link
+                href="/login"
+                aria-label="登录或注册"
+                title="登录或注册"
+                className="text-xs font-serif text-[var(--color-ink-400)] hover:text-[var(--color-vermillion)] transition-colors"
+              >
+                登录
+              </Link>
+            )}
+            <Link
+              href="/settings"
+              aria-label="管理数据"
+              title="管理数据"
+              className="text-xs font-serif text-[var(--color-ink-400)] hover:text-[var(--color-vermillion)] transition-colors"
+            >
+              管理 ⚙
+            </Link>
+          </div>
         </header>
 
         {records === null ? (
@@ -108,6 +137,7 @@ export default function HistoryListPage() {
           </Link>
         </footer>
       </div>
+      <MigrationOrchestrator onMigrationComplete={refresh} />
     </>
   )
 }
