@@ -30,6 +30,7 @@ type MockSupabase = {
     updateUser: ReturnType<typeof vi.fn>
     signOut: ReturnType<typeof vi.fn>
   }
+  rpc: ReturnType<typeof vi.fn>
   __triggerAuthChange: (event: string, session: unknown) => void
 }
 
@@ -49,6 +50,7 @@ function makeMockSupabase(initialSession: unknown = null): MockSupabase {
       updateUser: vi.fn(async () => ({ data: { user: null }, error: null })),
       signOut: vi.fn(async () => ({ error: null })),
     },
+    rpc: vi.fn(async () => ({ data: null, error: null })),
     __triggerAuthChange: (event, session) => callback?.(event, session),
   }
 }
@@ -181,6 +183,53 @@ describe('AuthProvider methods', () => {
     expect(supabase.auth.updateUser).toHaveBeenCalledWith({ password: 'newPw1234' })
   })
 
+  it('updateEmail forwards to supabase.auth.updateUser', async () => {
+    const supabase = makeMockSupabase()
+    const { result } = renderHook(() => useAuth(), { wrapper: wrapper(supabase) })
+    await waitFor(() => expect(result.current.loading).toBe(false))
+
+    await act(async () => {
+      await result.current.updateEmail('new@example.com')
+    })
+    expect(supabase.auth.updateUser).toHaveBeenCalledWith({ email: 'new@example.com' })
+  })
+
+  it('requestAccountDeletion calls request_account_deletion RPC', async () => {
+    const supabase = makeMockSupabase()
+    const { result } = renderHook(() => useAuth(), { wrapper: wrapper(supabase) })
+    await waitFor(() => expect(result.current.loading).toBe(false))
+
+    await act(async () => {
+      await result.current.requestAccountDeletion()
+    })
+    expect(supabase.rpc).toHaveBeenCalledWith('request_account_deletion')
+  })
+
+  it('restoreAccount calls restore_account RPC', async () => {
+    const supabase = makeMockSupabase()
+    const { result } = renderHook(() => useAuth(), { wrapper: wrapper(supabase) })
+    await waitFor(() => expect(result.current.loading).toBe(false))
+
+    await act(async () => {
+      await result.current.restoreAccount()
+    })
+    expect(supabase.rpc).toHaveBeenCalledWith('restore_account')
+  })
+
+  it('requestAccountDeletion returns error from RPC failure', async () => {
+    const supabase = makeMockSupabase()
+    supabase.rpc.mockResolvedValueOnce({ data: null, error: { message: 'not authenticated' } })
+    const { result } = renderHook(() => useAuth(), { wrapper: wrapper(supabase) })
+    await waitFor(() => expect(result.current.loading).toBe(false))
+
+    let err: unknown = null
+    await act(async () => {
+      const r = await result.current.requestAccountDeletion()
+      err = r.error
+    })
+    expect(err).toMatchObject({ message: expect.stringContaining('not authenticated') })
+  })
+
   it('returns error from signInWithPassword failure', async () => {
     const supabase = makeMockSupabase()
     supabase.auth.signInWithPassword.mockResolvedValueOnce({
@@ -221,6 +270,25 @@ describe('AuthProvider when supabase not configured', () => {
       err = r.error
     })
     expect(err).not.toBeNull()
+  })
+
+  it('updateEmail / requestAccountDeletion / restoreAccount also return NOT_CONFIGURED_ERROR', async () => {
+    const { result } = renderHook(() => useAuth(), {
+      wrapper: ({ children }) => <AuthProvider getSupabase={() => null}>{children}</AuthProvider>,
+    })
+    await waitFor(() => expect(result.current.loading).toBe(false))
+
+    let updateEmailErr: unknown = null
+    let requestDeleteErr: unknown = null
+    let restoreErr: unknown = null
+    await act(async () => {
+      updateEmailErr = (await result.current.updateEmail('x@x.com')).error
+      requestDeleteErr = (await result.current.requestAccountDeletion()).error
+      restoreErr = (await result.current.restoreAccount()).error
+    })
+    expect(updateEmailErr).not.toBeNull()
+    expect(requestDeleteErr).not.toBeNull()
+    expect(restoreErr).not.toBeNull()
   })
 })
 
