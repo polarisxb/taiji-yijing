@@ -38,7 +38,7 @@ export default function HexagramsPage() {
             >
               ← 回到问卦
             </Link>
-            <HistoryNavLink className="text-xs font-serif text-[var(--color-ink-400)] hover:text-[var(--color-vermillion)] transition-colors before:content-['·'] before:mr-4 before:text-[var(--color-ink-300)]" />
+            <HistoryNavLink className="text-sm font-serif text-[var(--color-vermillion)] hover:text-[var(--color-ink-900)] transition-colors before:content-['·'] before:mr-4 before:text-[var(--color-ink-300)]" />
           </div>
         </footer>
       </div>

@@ -236,11 +236,14 @@ export function MatchCard({ match, rank, situation }: Props) {
           <div className="px-6 py-4 border-t border-[var(--color-ink-100)]">
             <Link
               href={`/hexagram/${hexagram.number}?from=consult`}
-              className="inline-flex items-center gap-2 text-xs font-serif text-[var(--color-ink-600)] hover:text-[var(--color-vermillion)] transition-colors duration-200"
+              className="inline-flex items-center gap-2 text-sm font-serif text-[var(--color-vermillion)] border border-[var(--color-vermillion)] px-3 py-1 rounded hover:bg-[var(--color-vermillion)] hover:text-white transition-colors duration-200"
             >
               <span>深入此卦</span>
               <span>→</span>
             </Link>
+            <div className="mt-1 text-[10px] text-[var(--color-ink-400)] font-serif">
+              查看完整义理与案例
+            </div>
           </div>
 
           {rank === 1 && situation && (

@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import Link from 'next/link'
 import { MatchCard } from '@/components/MatchCard'
 import { TaijiSymbol } from '@/components/TaijiSymbol'
 import { Atmosphere } from '@/components/Atmosphere'
@@ -234,6 +235,20 @@ export default function Home() {
               述你所处之局，观三千年决策智慧如何解之
             </span>
           </p>
+
+          {/* 发现入口 — 提升「履」和卦象浏览的可见性 */}
+          <div
+            className="mt-6 flex justify-center gap-3"
+            style={{ animation: 'fadeUp 0.8s cubic-bezier(0.16,1,0.3,1) 1.25s both' }}
+          >
+            <HistoryNavLink />
+            <Link
+              href="/hexagrams"
+              className="inline-flex items-center gap-1.5 text-sm font-serif text-[var(--color-ink-600)] hover:text-[var(--color-vermillion)] transition-colors border border-[var(--color-ink-200)] px-3 py-1 rounded hover:border-[var(--color-vermillion)]"
+            >
+              六十四卦
+            </Link>
+          </div>
         </header>
 
         {/* ——— Input ——— */}
@@ -547,7 +562,6 @@ export default function Home() {
               <p className="text-[var(--color-ink-300)] text-[10px] font-serif tracking-wide">
                 以义解经 · 以象观变 · 以诚待人
               </p>
-              <HistoryNavLink className="inline-block text-[10px] font-serif text-[var(--color-ink-400)] hover:text-[var(--color-vermillion)] transition-colors" />
             </div>
           </div>
         </footer>

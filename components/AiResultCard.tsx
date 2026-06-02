@@ -91,14 +91,17 @@ export function AiResultCard({ hexagram, matchData, interpretation, done, situat
         </div>
       )}
 
-      {/* 深入此卦 */}
+      {/* 深入此卦 — 更明显的 CTA，鼓励用户探索完整卦象（结合 URL 状态保存，结果返回不丢） */}
       <div className="mt-6 pt-6 border-t border-[var(--color-ink-100)]">
         <Link
           href={deepLinkHref}
-          className="text-sm text-[var(--color-vermillion)] font-serif hover:underline"
+          className="inline-flex items-center gap-2 text-sm font-serif text-[var(--color-vermillion)] border border-[var(--color-vermillion)] px-4 py-1.5 rounded hover:bg-[var(--color-vermillion)] hover:text-white transition-colors duration-200"
         >
-          深入此卦 →
+          深入此卦 <span aria-hidden="true">→</span>
         </Link>
+        <div className="mt-1 text-[10px] text-[var(--color-ink-400)] font-serif">
+          查看完整义理、六爻与跨文化案例
+        </div>
       </div>
 
       {/* 记此一卦 — 解读完成后渐显（PR-2/F：让用户先读完再动） */}
