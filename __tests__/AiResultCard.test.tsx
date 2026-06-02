@@ -237,21 +237,29 @@ describe('AiResultCard — SaveConsultationButton', () => {
   })
 })
 
-// ─── 5. "深入此卦" link uses correct phase param ───────────────────────────
+// ─── 5. "深入此卦" link carries phase + result URL state ───────────────────
 
 describe('AiResultCard — 深入此卦 link', () => {
-  it('links to /hexagram/{number}?phase={yaoPosition}', () => {
+  it('links to /hexagram/{number} with phase, from=consult, and r 状态参数', () => {
     render(
       <AiResultCard
         hexagram={makeHexagram({ number: 5 })}
         matchData={makeMatch({ yaoPosition: 4 })}
         interpretation=""
         done={false}
-        situation=""
+        situation="我在考虑一个重要决定"
       />,
     )
     const link = screen.getByText(/深入此卦/).closest('a')
     expect(link).not.toBeNull()
-    expect(link?.getAttribute('href')).toBe('/hexagram/5?phase=4')
+    const href = link?.getAttribute('href') ?? ''
+    expect(href.startsWith('/hexagram/5?phase=4')).toBe(true)
+    expect(href).toContain('from=consult')
+    // r 参数携带可还原首页结果的编码状态
+    const r = new URLSearchParams(href.split('?')[1]).get('r')
+    expect(r).toBeTruthy()
+    const restored = new URLSearchParams(decodeURIComponent(r!))
+    expect(restored.get('h')).toBe('5')
+    expect(restored.get('p')).toBe('4')
   })
 })

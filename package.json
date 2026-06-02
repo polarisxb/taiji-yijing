@@ -21,9 +21,12 @@
     "@supabase/supabase-js": "^2.106.2",
     "ai": "^6.0.191",
     "lucide-react": "^0.460.0",
+    "lz-string": "^1.5.0",
     "next": "^15.0.3",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "react-markdown": "^10.1.0",
+    "remark-gfm": "^4.0.1",
     "zod": "^4.4.3"
   },
   "lint-staged": {

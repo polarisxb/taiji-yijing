@@ -8,6 +8,7 @@ import { ReasoningPanel } from './ReasoningPanel'
 import { StreamingText } from './StreamingText'
 import { SaveConsultationButton } from './zheng/SaveConsultationButton'
 import { confidenceToScore, getConfidenceBadge } from '@/lib/zheng/confidence'
+import { encodeResultToSearchParams } from '@/lib/result-url'
 
 type Props = {
   hexagram: Hexagram
@@ -20,6 +21,15 @@ type Props = {
 export function AiResultCard({ hexagram, matchData, interpretation, done, situation }: Props) {
   const yaoName = hexagram.yao[matchData.yaoPosition - 1]?.name ?? `第${matchData.yaoPosition}爻`
   const badge = getConfidenceBadge(matchData.confidence)
+
+  // 把当前结果的首页 URL 状态编码进 r 参数，详情页「返回我的结果」据此还原带状态首页
+  const homeState = encodeResultToSearchParams({
+    situation,
+    hexagramNumber: hexagram.number,
+    yaoPosition: matchData.yaoPosition,
+    confidence: matchData.confidence,
+  }).toString()
+  const deepLinkHref = `/hexagram/${hexagram.number}?phase=${matchData.yaoPosition}&from=consult&r=${encodeURIComponent(homeState)}`
 
   return (
     <div
@@ -84,7 +94,7 @@ export function AiResultCard({ hexagram, matchData, interpretation, done, situat
       {/* 深入此卦 */}
       <div className="mt-6 pt-6 border-t border-[var(--color-ink-100)]">
         <Link
-          href={`/hexagram/${hexagram.number}?phase=${matchData.yaoPosition}`}
+          href={deepLinkHref}
           className="text-sm text-[var(--color-vermillion)] font-serif hover:underline"
         >
           深入此卦 →

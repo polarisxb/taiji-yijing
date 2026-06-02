@@ -10,11 +10,15 @@ function BackBarInner() {
 
   if (!fromConsult) return null
 
+  // 携带结果状态返回首页，使其能复原「我的结果」；无 r 时回退到普通首页（依赖 localStorage）
+  const r = searchParams.get('r')
+  const href = r ? `/?${decodeURIComponent(r)}` : '/'
+
   return (
     <div className="fixed top-0 left-0 right-0 z-50 bg-[var(--color-paper)]/90 backdrop-blur-sm border-b border-[var(--color-ink-100)]">
       <div className="max-w-3xl mx-auto px-6 py-3 flex items-center">
         <Link
-          href="/"
+          href={href}
           className="text-xs font-serif text-[var(--color-ink-600)] hover:text-[var(--color-vermillion)] transition-colors duration-200 flex items-center gap-2"
         >
           <span>←</span>

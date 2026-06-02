@@ -1,6 +1,8 @@
 'use client'
 
 import { useState } from 'react'
+import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
 import { SmoothExpand } from './SmoothExpand'
 import { getConfidenceBadge } from '@/lib/zheng/confidence'
 import type { AiConfidence } from '@/lib/zheng/types'
@@ -36,7 +38,7 @@ export function ReasoningPanel({ reasoning, confidence }: Props) {
       </button>
       <SmoothExpand open={open} duration={300}>
         <div
-          className="mt-3 pl-4 text-sm text-[var(--color-ink-600)] font-serif leading-[2.2] whitespace-pre-wrap"
+          className="mt-3 pl-4 text-sm text-[var(--color-ink-600)] font-serif leading-[2.2] prose prose-sm max-w-none"
           style={{
             borderLeft: '2px solid var(--color-vermillion)',
             borderImage:
@@ -45,7 +47,7 @@ export function ReasoningPanel({ reasoning, confidence }: Props) {
             transition: 'opacity 0.4s ease 0.1s',
           }}
         >
-          {reasoning}
+          <ReactMarkdown remarkPlugins={[remarkGfm]}>{reasoning}</ReactMarkdown>
         </div>
       </SmoothExpand>
     </div>

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { MatchCard } from '@/components/MatchCard'
 import { TaijiSymbol } from '@/components/TaijiSymbol'
 import { Atmosphere } from '@/components/Atmosphere'
@@ -9,8 +9,13 @@ import { InlineErrorState } from '@/components/InlineErrorState'
 import { AiResultCard } from '@/components/AiResultCard'
 import { HistoryNavLink } from '@/components/zheng/HistoryNavLink'
 import { useStreamingConsult } from '@/hooks/useStreamingConsult'
+import type { MatchData } from '@/hooks/useStreamingConsult'
 import { findHexagramByNumber } from '@/lib/hexagram-utils'
+import { saveLastConsult, loadLastConsult, clearLastConsult } from '@/lib/persist-consult'
+import { encodeResultToSearchParams, decodeResultFromSearchParams } from '@/lib/result-url'
+import type { ResultUrlState } from '@/lib/result-url'
 import type { ConsultResponse } from '@/lib/types'
+import type { PersistedConsult } from '@/lib/persist-consult'
 
 const SAMPLE_SITUATIONS = [
   {
@@ -31,6 +36,19 @@ const SAMPLE_SITUATIONS = [
   },
 ]
 
+// 跨设备打开分享链接、本地无缓存时，仅凭 URL 字段重建的降级结果（reasoning/yaoBrief 留空）
+function degradedMatchData(state: ResultUrlState): MatchData {
+  return {
+    hexagramNumber: state.hexagramNumber,
+    reasoning: '',
+    confidence: state.confidence,
+    yaoPosition: state.yaoPosition,
+    yaoConfidence: state.confidence,
+    yaoBrief: '',
+    runners: [],
+  }
+}
+
 export default function Home() {
   const [situation, setSituation] = useState('')
   const [mode, setMode] = useState<'classic' | 'ai'>('ai')
@@ -43,6 +61,84 @@ export default function Home() {
   // AI mode state
   const ai = useStreamingConsult()
   const aiHexagram = ai.matchData ? findHexagramByNumber(ai.matchData.hexagramNumber) : null
+
+  // 恢复上次结果
+  function handleRestoreLastConsult() {
+    if (!persistedConsult) return
+
+    setSituation(persistedConsult.situation)
+    setMode('ai')
+    ai.restoreResult({
+      matchData: persistedConsult.matchData,
+      interpretation: persistedConsult.interpretation,
+    })
+
+    setShowRestoreBanner(false)
+  }
+
+  function handleClearPersistedConsult() {
+    clearLastConsult()
+    setPersistedConsult(null)
+    setShowRestoreBanner(false)
+  }
+
+  // 上次结果恢复（localStorage）
+  const [persistedConsult, setPersistedConsult] = useState<PersistedConsult | null>(null)
+  const [showRestoreBanner, setShowRestoreBanner] = useState(false)
+
+  // 页面加载时恢复结果：URL 优先，localStorage 降级
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    const urlState = decodeResultFromSearchParams(params)
+
+    if (urlState) {
+      // URL 命中：尝试用 localStorage 补齐完整结果（同设备），否则走降级视图（跨设备）
+      const saved = loadLastConsult()
+      setMode('ai')
+
+      if (
+        saved &&
+        encodeResultToSearchParams({
+          situation: saved.situation,
+          hexagramNumber: saved.matchData.hexagramNumber,
+          yaoPosition: saved.matchData.yaoPosition,
+          confidence: saved.matchData.confidence,
+        }).get('hash') === urlState.situationHash
+      ) {
+        setSituation(saved.situation)
+        ai.restoreResult({ matchData: saved.matchData, interpretation: saved.interpretation })
+      } else {
+        if (urlState.situation) setSituation(urlState.situation)
+        ai.restoreResult({ matchData: degradedMatchData(urlState), interpretation: '' })
+      }
+      return // URL 优先，不显示 localStorage 提示条
+    }
+
+    // URL 无有效状态 → 回退到 localStorage 提示条
+    const saved = loadLastConsult()
+    if (saved) {
+      setPersistedConsult(saved)
+      setShowRestoreBanner(true)
+    }
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps -- mount-only URL/local hydration; restoreResult stable via useCallback
+
+  // AI 结果完成后：持久化到 localStorage + 将状态写入 URL（replace，不新增历史记录）
+  useEffect(() => {
+    if (mode === 'ai' && ai.done && ai.matchData && ai.interpretation) {
+      saveLastConsult({
+        situation,
+        matchData: ai.matchData,
+        interpretation: ai.interpretation,
+      })
+      const qs = encodeResultToSearchParams({
+        situation,
+        hexagramNumber: ai.matchData.hexagramNumber,
+        yaoPosition: ai.matchData.yaoPosition,
+        confidence: ai.matchData.confidence,
+      }).toString()
+      window.history.replaceState(null, '', `${window.location.pathname}?${qs}`)
+    }
+  }, [mode, ai.done, ai.matchData, ai.interpretation, situation])
 
   async function handleClassicSubmit() {
     if (!situation.trim()) return
@@ -70,6 +166,13 @@ export default function Home() {
 
   function handleSubmit() {
     if (!situation.trim()) return
+
+    // 开始新的一次问卦时，清除旧的持久化结果与 URL 状态
+    clearLastConsult()
+    setPersistedConsult(null)
+    setShowRestoreBanner(false)
+    window.history.replaceState(null, '', window.location.pathname)
+
     if (mode === 'ai') {
       ai.submit(situation.trim())
     } else {
@@ -241,6 +344,29 @@ export default function Home() {
             ))}
           </div>
         </section>
+
+        {/* ——— 恢复上次结果提示条 ——— */}
+        {showRestoreBanner && persistedConsult && !ai.matchData && !loading && (
+          <div className="mb-8 p-4 border border-[var(--color-ink-200)] rounded flex flex-col sm:flex-row sm:items-center gap-3 bg-[var(--color-paper-light)] animate-fade-up">
+            <div className="flex-1 text-sm font-serif text-[var(--color-ink-600)]">
+              检测到你上次的问卦结果（{new Date(persistedConsult.savedAt).toLocaleDateString()}）
+            </div>
+            <div className="flex gap-2">
+              <button
+                onClick={handleRestoreLastConsult}
+                className="text-sm font-serif px-4 py-1.5 border border-[var(--color-vermillion)] text-[var(--color-vermillion)] rounded hover:bg-[var(--color-vermillion)] hover:text-white transition-colors"
+              >
+                恢复结果
+              </button>
+              <button
+                onClick={handleClearPersistedConsult}
+                className="text-sm font-serif px-4 py-1.5 text-[var(--color-ink-400)] hover:text-[var(--color-ink-600)] transition-colors"
+              >
+                清除
+              </button>
+            </div>
+          </div>
+        )}
 
         {/* ——— Loading ——— */}
         {loading && (

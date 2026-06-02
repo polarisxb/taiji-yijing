@@ -96,5 +96,18 @@ export function useStreamingConsult() {
     setState((s) => ({ ...s, loading: false, done: true }))
   }, [])
 
-  return { ...state, submit, cancel }
+  /**
+   * 从持久化数据恢复结果（用于返回首页后恢复上一次问卦）
+   */
+  const restoreResult = useCallback((data: { matchData: MatchData; interpretation: string }) => {
+    setState({
+      loading: false,
+      matchData: data.matchData,
+      interpretation: data.interpretation,
+      error: null,
+      done: true,
+    })
+  }, [])
+
+  return { ...state, submit, cancel, restoreResult }
 }
