@@ -18,6 +18,7 @@ next-env.d.ts
 *.pem
 .vscode/
 .idea/
+.claude/
 
 # debug
 npm-debug.log*

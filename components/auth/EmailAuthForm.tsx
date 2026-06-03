@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { useState, type FormEvent } from 'react'
 
 import { authErrorToMessage } from '@/lib/auth/errors'
+import { safeRedirectPath } from '@/lib/auth/redirect'
 import { useAuth } from '@/lib/auth/use-auth'
 
 type Mode = 'login' | 'register'
@@ -18,7 +19,7 @@ const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 export function EmailAuthForm({ mode }: EmailAuthFormProps) {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const next = searchParams?.get('next') ?? '/'
+  const next = safeRedirectPath(searchParams?.get('next'))
 
   const { signInWithPassword, signUpWithPassword } = useAuth()
 

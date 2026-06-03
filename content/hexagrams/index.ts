@@ -8,7 +8,7 @@ import { zhun } from './03-zhun'
  *
  * 增加新卦时：
  * 1. 在此目录下创建 NN-name.ts 文件
- * 2. 参考 docs/CONTENT-GUIDE.md 的字段要求
+ * 2. 参考 docs/CONTENT-GUIDE.md（字段规范）与 docs/AI-AUTHORING-PLAYBOOK.md（AI 整理流程 + 提示词）
  * 3. 在此文件 import 并加入 ALL_HEXAGRAMS
  */
 export const ALL_HEXAGRAMS: Hexagram[] = [qian, kun, zhun]

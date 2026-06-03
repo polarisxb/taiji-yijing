@@ -1,0 +1,25 @@
+{
+  "number": 3,
+  "name": { "chinese": "屯", "pinyin": "zhūn", "english": "Difficulty at the Beginning" },
+  "trigrams": { "upper": "坎", "lower": "震" },
+  "binary": "010001",
+  "judgment": { "text": "屯：元、亨、利、贞，勿用有攸往，利建侯。" },
+  "image": { "text": "云雷屯，君子以经纶。" },
+  "yao": [
+    { "position": 1, "name": "初九", "text": "磐桓，利居贞，利建侯。" },
+    {
+      "position": 2,
+      "name": "六二",
+      "text": "屯如邅如，乘马班如，匪寇婚媾，女子贞不字，十年乃字。"
+    },
+    { "position": 3, "name": "六三", "text": "即鹿无虞，惟入于林中，君子几不如舍，往吝。" },
+    { "position": 4, "name": "六四", "text": "乘马班如，求婚媾，往吉，无不利。" },
+    { "position": 5, "name": "九五", "text": "屯其膏，小贞吉，大贞凶。" },
+    { "position": 6, "name": "上六", "text": "乘马班如，泣血涟如。" }
+  ],
+  "classicalCommentary": {
+    "chengYi": "屯者，物之始生。物之始生，郁结未通，故为屯。屯之时，天下大乱，而无君长以统之，故利建侯。",
+    "zhuXi": "震、坎皆三画卦之名。震一阳动于二阴之下，故其德为动；坎一阳陷于二阴之间，故其德为陷。",
+    "wangBi": ""
+  }
+}

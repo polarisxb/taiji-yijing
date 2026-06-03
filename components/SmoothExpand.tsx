@@ -26,7 +26,7 @@ export function SmoothExpand({ open, children, duration = 350 }: Props) {
       setHeight(0)
       setIsAnimating(true)
       // 强制 reflow
-      el.offsetHeight
+      void el.offsetHeight
       requestAnimationFrame(() => {
         setHeight(targetHeight)
       })
@@ -41,7 +41,7 @@ export function SmoothExpand({ open, children, duration = 350 }: Props) {
       const currentHeight = el.scrollHeight
       setHeight(currentHeight)
       setIsAnimating(true)
-      el.offsetHeight
+      void el.offsetHeight
       requestAnimationFrame(() => {
         setHeight(0)
       })

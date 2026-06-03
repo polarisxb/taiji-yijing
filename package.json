@@ -13,6 +13,7 @@
     "test:watch": "vitest",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
+    "verify:facts": "node scripts/verify-hexagram-facts.mjs",
     "prepare": "husky"
   },
   "dependencies": {
