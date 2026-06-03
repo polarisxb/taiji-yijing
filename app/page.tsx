@@ -522,9 +522,6 @@ export default function Home() {
           </section>
         )}
 
-        {/* 预留山空间：让当前可见的“页面”下面实时有山，不需要滚动到文档最底 */}
-        <div className="h-[28vh] md:h-[32vh]" aria-hidden="true" />
-
         {/* ——— Footer ——— */}
         <footer className="mt-8 text-center">
           {/* 水墨晕染分割 */}

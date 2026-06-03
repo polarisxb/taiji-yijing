@@ -124,9 +124,6 @@ export default function ResetPasswordPage() {
             </form>
           )}
         </div>
-
-        {/* 预留山空间：让表单卡片下面实时有山 */}
-        <div className="h-[20vh]" aria-hidden="true" />
       </main>
     </>
   )

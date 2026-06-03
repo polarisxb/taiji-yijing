@@ -27,9 +27,6 @@ export default function LoginPage() {
             <EmailAuthForm mode="login" />
           </Suspense>
         </div>
-
-        {/* 预留山空间：让登录卡片下面实时有山 */}
-        <div className="h-[20vh]" aria-hidden="true" />
       </main>
     </>
   )

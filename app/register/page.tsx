@@ -27,9 +27,6 @@ export default function RegisterPage() {
             <EmailAuthForm mode="register" />
           </Suspense>
         </div>
-
-        {/* 预留山空间：让注册卡片下面实时有山 */}
-        <div className="h-[20vh]" aria-hidden="true" />
       </main>
     </>
   )

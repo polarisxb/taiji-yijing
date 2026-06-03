@@ -62,9 +62,6 @@ export default async function HexagramDetailPage({ params, searchParams }: Props
         <ActionSummary hexagram={hexagram} />
         <RelatedHexagrams hexagram={hexagram} />
 
-        {/* 预留山空间：让当前可见的页面下面实时有山 */}
-        <div className="h-[28vh] md:h-[32vh]" aria-hidden="true" />
-
         {/* Footer */}
         <footer className="py-16 text-center">
           <div className="divider-classical mb-8">

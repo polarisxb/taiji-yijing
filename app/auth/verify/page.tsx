@@ -33,9 +33,6 @@ export default function VerifyPage() {
             返回登录
           </Link>
         </div>
-
-        {/* 预留山空间：让验证页面下面实时有山 */}
-        <div className="h-[20vh]" aria-hidden="true" />
       </main>
     </>
   )
