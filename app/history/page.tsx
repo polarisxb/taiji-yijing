@@ -128,6 +128,9 @@ export default function HistoryListPage() {
           </>
         )}
 
+        {/* 预留山空间：让当前可见的页面下面实时有山 */}
+        <div className="h-[28vh] md:h-[32vh]" aria-hidden="true" />
+
         <footer className="mt-16 text-center">
           <Link
             href="/"

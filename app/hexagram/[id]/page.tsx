@@ -50,7 +50,7 @@ export default async function HexagramDetailPage({ params, searchParams }: Props
       <Atmosphere />
       <FloatingBackBar />
 
-      <div className="relative z-10 max-w-3xl mx-auto px-6">
+      <div className="relative z-10 max-w-3xl mx-auto px-6 pb-[20vh]">
         <HexagramHero hexagram={hexagram} />
         <ClassicalText hexagram={hexagram} />
         <InterpretationSection hexagram={hexagram} />
@@ -61,6 +61,9 @@ export default async function HexagramDetailPage({ params, searchParams }: Props
         <YaoTimeline hexagram={hexagram} highlightPhase={highlightPhase} />
         <ActionSummary hexagram={hexagram} />
         <RelatedHexagrams hexagram={hexagram} />
+
+        {/* 预留山空间：让当前可见的页面下面实时有山 */}
+        <div className="h-[28vh] md:h-[32vh]" aria-hidden="true" />
 
         {/* Footer */}
         <footer className="py-16 text-center">

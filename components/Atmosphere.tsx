@@ -88,10 +88,10 @@ export function Atmosphere() {
     <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
       {/* 水墨山峦 — 多层 SVG 剪影 */}
       <svg
-        className="absolute bottom-0 left-0 w-full opacity-[0.04]"
+        className="absolute bottom-0 left-0 w-full opacity-[0.06]"
         viewBox="0 0 1440 400"
         preserveAspectRatio="none"
-        style={{ height: '40vh' }}
+        style={{ height: '35vh' }}
       >
         <path
           d="M0,400 L0,280 Q120,180 240,250 Q360,150 480,220 Q560,120 720,200 Q840,100 960,180 Q1080,80 1200,160 Q1320,100 1440,140 L1440,400 Z"
@@ -100,10 +100,10 @@ export function Atmosphere() {
         />
       </svg>
       <svg
-        className="absolute bottom-0 left-0 w-full opacity-[0.03]"
+        className="absolute bottom-0 left-0 w-full opacity-[0.04]"
         viewBox="0 0 1440 400"
         preserveAspectRatio="none"
-        style={{ height: '50vh' }}
+        style={{ height: '45vh' }}
       >
         <path
           d="M0,400 L0,320 Q180,220 360,300 Q480,200 600,260 Q720,160 900,240 Q1020,140 1140,200 Q1300,120 1440,180 L1440,400 Z"
@@ -112,10 +112,10 @@ export function Atmosphere() {
         />
       </svg>
       <svg
-        className="absolute bottom-0 left-0 w-full opacity-[0.02]"
+        className="absolute bottom-0 left-0 w-full opacity-[0.03]"
         viewBox="0 0 1440 400"
         preserveAspectRatio="none"
-        style={{ height: '60vh' }}
+        style={{ height: '55vh' }}
       >
         <path
           d="M0,400 L0,350 Q200,250 400,330 Q550,230 700,290 Q850,190 1000,270 Q1150,180 1300,230 Q1400,200 1440,220 L1440,400 Z"
