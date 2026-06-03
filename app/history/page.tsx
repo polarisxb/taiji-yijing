@@ -42,106 +42,103 @@ export default function HistoryListPage() {
   return (
     <>
       <Atmosphere />
-      {/* 内容视口容器：限制高度为视口减去山的高度，内部滚动，保证山实时在当前屏幕显示的内容下面 */}
-      <div
-        className="relative z-10 max-w-3xl mx-auto px-6"
-        style={{ height: 'calc(100vh - 30vh)', overflow: 'hidden' }}
-      >
-        <div className="h-full overflow-y-auto py-16 md:py-24">
-          <header className="mb-12 text-center relative">
-            <h1 className="font-serif text-5xl font-bold text-[var(--color-ink-900)] tracking-widest">
-              履
-            </h1>
-            <p className="mt-4 text-xs tracking-[0.4em] text-[var(--color-ink-400)] font-serif">
-              走过的路 · {loading ? '载入中…' : user ? '已同步到云端' : '暂存本地'}
-            </p>
-            <div className="absolute right-0 top-0 flex items-center gap-3">
-              {loading ? null : user ? (
-                <Link
-                  href="/settings"
-                  aria-label={`账号 ${user.email ?? ''}`}
-                  title={user.email ?? '已登录'}
-                  className="text-xs font-serif text-[var(--color-ink-400)] hover:text-[var(--color-vermillion)] transition-colors"
-                >
-                  {user.email ? user.email.split('@')[0] : '账号'}
-                </Link>
-              ) : (
-                <Link
-                  href="/login"
-                  aria-label="登录或注册"
-                  title="登录或注册"
-                  className="text-xs font-serif text-[var(--color-ink-400)] hover:text-[var(--color-vermillion)] transition-colors"
-                >
-                  登录
-                </Link>
-              )}
+      <div className="relative z-10 max-w-3xl mx-auto px-6 py-16 md:py-24">
+        <header className="mb-12 text-center relative">
+          <h1 className="font-serif text-5xl font-bold text-[var(--color-ink-900)] tracking-widest">
+            履
+          </h1>
+          <p className="mt-4 text-xs tracking-[0.4em] text-[var(--color-ink-400)] font-serif">
+            走过的路 · {loading ? '载入中…' : user ? '已同步到云端' : '暂存本地'}
+          </p>
+          <div className="absolute right-0 top-0 flex items-center gap-3">
+            {loading ? null : user ? (
               <Link
                 href="/settings"
-                aria-label="管理数据"
-                title="管理数据"
+                aria-label={`账号 ${user.email ?? ''}`}
+                title={user.email ?? '已登录'}
                 className="text-xs font-serif text-[var(--color-ink-400)] hover:text-[var(--color-vermillion)] transition-colors"
               >
-                管理 ⚙
+                {user.email ? user.email.split('@')[0] : '账号'}
               </Link>
-            </div>
-          </header>
-
-          {records === null ? (
-            <p className="text-center text-sm font-serif text-[var(--color-ink-400)]">载入中…</p>
-          ) : records.length === 0 ? (
-            <div className="text-center space-y-4">
-              <p className="text-sm font-serif text-[var(--color-ink-600)]">
-                还没有记录。在匹配卦后点「记此一卦」即可存下。
-              </p>
+            ) : (
               <Link
-                href="/"
-                className="inline-block text-xs font-serif text-[var(--color-vermillion)] hover:underline"
+                href="/login"
+                aria-label="登录或注册"
+                title="登录或注册"
+                className="text-xs font-serif text-[var(--color-ink-400)] hover:text-[var(--color-vermillion)] transition-colors"
               >
-                回首页问卦 →
+                登录
               </Link>
-            </div>
-          ) : (
-            <>
-              <nav className="flex flex-wrap items-center justify-center gap-3 mb-8 text-xs font-serif">
-                {FILTERS.map((f) => (
-                  <button
-                    key={f.value}
-                    type="button"
-                    onClick={() => setFilter(f.value)}
-                    className={
-                      filter === f.value
-                        ? 'px-3 py-1 rounded border border-[var(--color-vermillion)] text-[var(--color-vermillion)]'
-                        : 'px-3 py-1 rounded border border-transparent text-[var(--color-ink-400)] hover:text-[var(--color-ink-600)]'
-                    }
-                  >
-                    {f.label}
-                  </button>
-                ))}
-              </nav>
-
-              {filtered && filtered.length === 0 ? (
-                <p className="text-center text-sm font-serif text-[var(--color-ink-400)]">
-                  此筛选下暂无记录。
-                </p>
-              ) : (
-                <div className="space-y-4">
-                  {filtered!.map((r) => (
-                    <RecordCard key={r.id} record={r} />
-                  ))}
-                </div>
-              )}
-            </>
-          )}
-
-          <footer className="mt-16 text-center">
+            )}
             <Link
-              href="/"
+              href="/settings"
+              aria-label="管理数据"
+              title="管理数据"
               className="text-xs font-serif text-[var(--color-ink-400)] hover:text-[var(--color-vermillion)] transition-colors"
             >
-              ← 回首页
+              管理 ⚙
             </Link>
-          </footer>
-        </div>
+          </div>
+        </header>
+
+        {records === null ? (
+          <p className="text-center text-sm font-serif text-[var(--color-ink-400)]">载入中…</p>
+        ) : records.length === 0 ? (
+          <div className="text-center space-y-4">
+            <p className="text-sm font-serif text-[var(--color-ink-600)]">
+              还没有记录。在匹配卦后点「记此一卦」即可存下。
+            </p>
+            <Link
+              href="/"
+              className="inline-block text-xs font-serif text-[var(--color-vermillion)] hover:underline"
+            >
+              回首页问卦 →
+            </Link>
+          </div>
+        ) : (
+          <>
+            <nav className="flex flex-wrap items-center justify-center gap-3 mb-8 text-xs font-serif">
+              {FILTERS.map((f) => (
+                <button
+                  key={f.value}
+                  type="button"
+                  onClick={() => setFilter(f.value)}
+                  className={
+                    filter === f.value
+                      ? 'px-3 py-1 rounded border border-[var(--color-vermillion)] text-[var(--color-vermillion)]'
+                      : 'px-3 py-1 rounded border border-transparent text-[var(--color-ink-400)] hover:text-[var(--color-ink-600)]'
+                  }
+                >
+                  {f.label}
+                </button>
+              ))}
+            </nav>
+
+            {filtered && filtered.length === 0 ? (
+              <p className="text-center text-sm font-serif text-[var(--color-ink-400)]">
+                此筛选下暂无记录。
+              </p>
+            ) : (
+              <div className="space-y-4">
+                {filtered!.map((r) => (
+                  <RecordCard key={r.id} record={r} />
+                ))}
+              </div>
+            )}
+          </>
+        )}
+
+        {/* 预留山空间：让当前可见的页面下面实时有山 */}
+        <div className="h-[28vh] md:h-[32vh]" aria-hidden="true" />
+
+        <footer className="mt-16 text-center">
+          <Link
+            href="/"
+            className="text-xs font-serif text-[var(--color-ink-400)] hover:text-[var(--color-vermillion)] transition-colors"
+          >
+            ← 回首页
+          </Link>
+        </footer>
       </div>
       <MigrationOrchestrator onMigrationComplete={refresh} />
     </>

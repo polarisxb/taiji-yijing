@@ -15,38 +15,35 @@ export default function HexagramsPage() {
     <>
       <Atmosphere />
 
-      {/* 内容视口容器：限制高度为视口减去山的高度，内部滚动，保证山实时在当前屏幕显示的内容下面 */}
-      <div
-        className="relative z-10 max-w-4xl mx-auto px-6"
-        style={{ height: 'calc(100vh - 30vh)', overflow: 'hidden' }}
-      >
-        <div className="h-full overflow-y-auto py-16 md:py-24">
-          <header className="text-center mb-16">
-            <h1 className="font-serif text-5xl font-black text-[var(--color-ink-900)] tracking-widest">
-              六十四卦
-            </h1>
-            <p className="mt-4 text-sm text-[var(--color-ink-400)] font-serif">
-              {ALL_HEXAGRAMS.length}/64 卦已就绪
-            </p>
-            <div className="divider-classical w-48 mx-auto mt-6">
-              <span className="font-serif">☰ ☷</span>
-            </div>
-          </header>
+      <div className="relative z-10 max-w-4xl mx-auto px-6 py-16 md:py-24">
+        <header className="text-center mb-16">
+          <h1 className="font-serif text-5xl font-black text-[var(--color-ink-900)] tracking-widest">
+            六十四卦
+          </h1>
+          <p className="mt-4 text-sm text-[var(--color-ink-400)] font-serif">
+            {ALL_HEXAGRAMS.length}/64 卦已就绪
+          </p>
+          <div className="divider-classical w-48 mx-auto mt-6">
+            <span className="font-serif">☰ ☷</span>
+          </div>
+        </header>
 
-          <HexagramGrid hexagrams={ALL_HEXAGRAMS} />
+        <HexagramGrid hexagrams={ALL_HEXAGRAMS} />
 
-          <footer className="mt-16 text-center">
-            <div className="flex items-center justify-center gap-4">
-              <Link
-                href="/"
-                className="text-xs font-serif text-[var(--color-ink-400)] hover:text-[var(--color-vermillion)] transition-colors"
-              >
-                ← 回到问卦
-              </Link>
-              <HistoryNavLink className="text-sm font-serif text-[var(--color-vermillion)] hover:text-[var(--color-ink-900)] transition-colors before:content-['·'] before:mr-4 before:text-[var(--color-ink-300)]" />
-            </div>
-          </footer>
-        </div>
+        {/* 预留山空间：让当前可见的页面下面实时有山 */}
+        <div className="h-[28vh] md:h-[32vh]" aria-hidden="true" />
+
+        <footer className="mt-16 text-center">
+          <div className="flex items-center justify-center gap-4">
+            <Link
+              href="/"
+              className="text-xs font-serif text-[var(--color-ink-400)] hover:text-[var(--color-vermillion)] transition-colors"
+            >
+              ← 回到问卦
+            </Link>
+            <HistoryNavLink className="text-sm font-serif text-[var(--color-vermillion)] hover:text-[var(--color-ink-900)] transition-colors before:content-['·'] before:mr-4 before:text-[var(--color-ink-300)]" />
+          </div>
+        </footer>
       </div>
     </>
   )
